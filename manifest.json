@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "ChatBridge – AI Chat Compressor",
+  "version": "1.3.0",
+  "description": "Extract any AI chat conversation, compress it, and send it to ChatGPT, Claude, Gemini, or Perplexity in one click. Optional AI-powered compression using your own key from OpenRouter, NVIDIA, Groq, Together, Fireworks, DeepInfra, Mistral, or OpenAI.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "tabs",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "https://claude.ai/*",
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://gemini.google.com/*",
+    "https://www.perplexity.ai/*",
+    "https://openrouter.ai/*",
+    "https://integrate.api.nvidia.com/*",
+    "https://api.groq.com/*",
+    "https://api.together.xyz/*",
+    "https://api.fireworks.ai/*",
+    "https://api.deepinfra.com/*",
+    "https://api.mistral.ai/*",
+    "https://api.openai.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": { "16":"icons/icon16.png","32":"icons/icon32.png","48":"icons/icon48.png","128":"icons/icon128.png" }
+  },
+  "background": { "service_worker": "background.js" },
+  "icons": { "16":"icons/icon16.png","32":"icons/icon32.png","48":"icons/icon48.png","128":"icons/icon128.png" }
+}
