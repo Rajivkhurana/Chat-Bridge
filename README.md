@@ -1,16 +1,22 @@
-<div align="center">
-  <img src="icons/icon128.png" width="96" height="96" alt="ChatBridge Logo" />
-  <h1>ChatBridge</h1>
-  <p><b>Move AI conversations across models with zero context loss and zero token waste.</b></p>
-</div>
+<p align="center">
+  <img src="./icons/icon128.png" width="96" height="96" alt="ChatBridge Logo" />
+</p>
+
+<h1 align="center">ChatBridge</h1>
+
+<p align="center">
+  <b>Move AI conversations across models with zero context loss and zero token waste.</b>
+</p>
 
 ---
 
 ## 📸 Screenshots
 
-| 1. Extract Chat | 2. Compress & Send | 3. BYO-Key Settings |
-|:---:|:---:|:---:|
-| <img src="store-assets/screenshot-1-extract.png" width="280" alt="Extract Chat" /> | <img src="store-assets/screenshot-2-compress-and-send.png" width="280" alt="Compress and Send" /> | <img src="store-assets/screenshot-3-bring-your-own-key.png" width="280" alt="BYOK Settings" /> |
+<p align="center">
+  <img src="./store-assets/screenshot-1-extract.png" width="32%" alt="Extract Chat" />
+  <img src="./store-assets/screenshot-2-compress-and-send.png" width="32%" alt="Compress and Send" />
+  <img src="./store-assets/screenshot-3-bring-your-own-key.png" width="32%" alt="BYOK Settings" />
+</p>
 
 ---
 
