@@ -54,6 +54,17 @@
       flex-shrink: 0;
       box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
       overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .logo.kyber-glow {
+      box-shadow: 0 0 12px #38bdf8, 0 0 20px #818cf8 !important;
+      animation: saberPulse 1.8s infinite alternate ease-in-out;
+      transform: scale(1.1);
+    }
+    @keyframes saberPulse {
+      0% { filter: drop-shadow(0 0 4px #38bdf8); }
+      50% { filter: drop-shadow(0 0 8px #a855f7); }
+      100% { filter: drop-shadow(0 0 10px #10b981); }
     }
     .logo img {
       width: 100%;
@@ -73,7 +84,8 @@
     .tabs {
       margin-left: auto;
       display: flex;
-      gap: 3px;
+      align-items: center;
+      gap: 4px;
       background: #f1f5f9;
       padding: 2px;
       border-radius: 6px;
@@ -94,6 +106,78 @@
       background: var(--surf);
       color: var(--text);
       box-shadow: var(--shadow-sm);
+    }
+    .gh-btn {
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .gh-btn:hover {
+      color: var(--text);
+      background: var(--surf);
+    }
+
+    .dev-card {
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .dev-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+    }
+    .dev-title {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .dev-sub {
+      color: var(--muted);
+    }
+    .dev-links {
+      display: flex;
+      gap: 6px;
+    }
+    .dev-link-btn {
+      flex: 1;
+      padding: 4px 6px;
+      background: var(--surf);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+    .dev-link-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+    .dev-link-btn.sec {
+      background: #f1f5f9;
+      border-color: transparent;
+    }
+    .dev-link-btn.sec:hover {
+      background: #e2e8f0;
+      color: var(--text);
     }
 
     .panel {
@@ -279,7 +363,8 @@
       display: flex;
       gap: 5px;
       align-items: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      width: 100%;
     }
     .pill {
       display: flex;
@@ -505,10 +590,21 @@
       display: inline-block;
       width: 10px;
       height: 10px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: #fff;
+      border: 2px solid rgba(0, 0, 0, 0.18);
+      border-top-color: currentColor;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 3px;
+    }
+    .btn-pri .spin, .btn-ai .spin, .btn-send-current .spin {
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-top-color: #ffffff;
+    }
+    .btn.loading {
+      opacity: 0.9 !important;
+      cursor: wait !important;
+      pointer-events: none;
     }
     .ai-prompt {
       background: #fffbeb;
@@ -571,6 +667,9 @@
     <div class="tabs">
       <button class="tab active" data-panel="main">Main</button>
       <button class="tab" data-panel="settings">Settings</button>
+      <a href="https://github.com/Rajivkhurana/Chat-Bridge" target="_blank" class="gh-btn" title="Star ChatBridge on GitHub" aria-label="GitHub Repository">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
     </div>
   </div>
 
@@ -584,11 +683,11 @@
     <div>
       <div class="lbl">Output Mode</div>
       <div class="grid2">
-        <div class="opt" data-mode="context" role="button" tabindex="0" aria-pressed="false"><div class="opt-t">Full Chat</div><div class="opt-d">Current chat, no truncation</div><span class="opt-b">no AI</span></div>
-        <div class="opt sel" data-mode="smart" role="button" tabindex="0" aria-pressed="true"><div class="opt-t">Smart</div><div class="opt-d">Strip filler, keep key points</div><span class="opt-b">~40% less</span></div>
-        <div class="opt" data-mode="aggressive" role="button" tabindex="0" aria-pressed="false"><div class="opt-t">Aggressive</div><div class="opt-d">Max compression, bullet form</div><span class="opt-b">~65% less</span></div>
-        <div class="opt" data-mode="user-only" role="button" tabindex="0" aria-pressed="false"><div class="opt-t">User Only</div><div class="opt-d">Only your messages</div><span class="opt-b">~70% less</span></div>
-        <div class="opt" data-mode="raw" role="button" tabindex="0" aria-pressed="false"><div class="opt-t">Raw</div><div class="opt-d">Full conversation unchanged</div><span class="opt-b">0%</span></div>
+        <div class="opt" data-mode="context" role="button" tabindex="0" aria-pressed="false" title="Transfers the complete conversation transcript cleanly formatted with no truncation"><div class="opt-t">Full Chat</div><div class="opt-d">Current chat, no truncation</div><span class="opt-b">no AI</span></div>
+        <div class="opt sel" data-mode="smart" role="button" tabindex="0" aria-pressed="true" title="Strips greetings, pleasantries, and filler while keeping 100% of code and substance intact (~40% smaller)"><div class="opt-t">Smart</div><div class="opt-d">Strip filler, keep key points</div><span class="opt-b">~40% less</span></div>
+        <div class="opt" data-mode="aggressive" role="button" tabindex="0" aria-pressed="false" title="Converts dialogue into dense bullet points while preserving full code blocks (~65% smaller)"><div class="opt-t">Aggressive</div><div class="opt-d">Max compression, bullet form</div><span class="opt-b">~65% less</span></div>
+        <div class="opt" data-mode="user-only" role="button" tabindex="0" aria-pressed="false" title="Extracts only questions and prompts asked by the user (~70% smaller)"><div class="opt-t">User Only</div><div class="opt-d">Only your messages</div><span class="opt-b">~70% less</span></div>
+        <div class="opt" data-mode="raw" role="button" tabindex="0" aria-pressed="false" title="Exports the raw conversation transcript verbatim without changes"><div class="opt-t">Raw</div><div class="opt-d">Full conversation unchanged</div><span class="opt-b">0%</span></div>
       </div>
     </div>
 
@@ -596,7 +695,7 @@
       <div class="lbl">Send To</div>
       <div class="target-row">
         <!-- ChatGPT -->
-        <button class="tbtn sel" data-target="chatgpt" title="Send to ChatGPT">
+        <button class="tbtn sel" data-target="chatgpt" title="Open ChatGPT and paste context into prompt box">
           <svg viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/>
             <path d="M12 6v12M6 12h12"/>
@@ -604,21 +703,21 @@
           ChatGPT
         </button>
         <!-- Claude -->
-        <button class="tbtn" data-target="claude" title="Send to Claude">
+        <button class="tbtn" data-target="claude" title="Open Claude and paste context into prompt box">
           <svg viewBox="0 0 24 24" fill="#d97706">
             <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/>
           </svg>
           Claude
         </button>
         <!-- Gemini -->
-        <button class="tbtn" data-target="gemini" title="Send to Gemini">
+        <button class="tbtn" data-target="gemini" title="Open Google Gemini and paste context into prompt box">
           <svg viewBox="0 0 24 24" fill="#2563eb">
             <path d="M12 2C12 7.523 7.523 12 2 12C7.523 12 12 16.477 12 22C12 16.477 16.477 12 22 12C16.477 12 12 7.523 12 2Z"/>
           </svg>
           Gemini
         </button>
         <!-- Perplexity -->
-        <button class="tbtn" data-target="perplexity" title="Send to Perplexity">
+        <button class="tbtn" data-target="perplexity" title="Open Perplexity AI and paste context into search box">
           <svg viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -626,7 +725,7 @@
           Perplexity
         </button>
         <!-- Copy -->
-        <button class="tbtn" data-target="clipboard" title="Copy to Clipboard">
+        <button class="tbtn" data-target="clipboard" title="Copy compressed context to clipboard (paste anywhere with Ctrl+V)">
           <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -638,14 +737,14 @@
 
     <div>
       <div class="lbl">Preview</div>
-      <div class="preview" id="preview"><span class="ph">Click Extract to read the page…</span></div>
+      <div class="preview" id="preview" title="Live preview of the context that will be transferred"><span class="ph">Click Extract to read the page…</span></div>
     </div>
 
     <div class="stats" id="stats" style="display:none">
-      <div class="pill"><span class="l">orig</span><span class="v" id="tOrig">–</span></div>
+      <div class="pill" title="Estimated original token count of the raw chat transcript"><span class="l">orig</span><span class="v" id="tOrig">–</span></div>
       <span class="arrow">→</span>
-      <div class="pill"><span class="l">compressed</span><span class="v" id="tComp">–</span></div>
-      <div class="pill g"><span class="l">saved</span><span class="v" id="tSaved">–</span></div>
+      <div class="pill" title="Estimated compressed token count of the context bridge"><span class="l">comp</span><span class="v" id="tComp">–</span></div>
+      <div class="pill g" title="Total tokens and context window capacity saved"><span class="l">saved</span><span class="v" id="tSaved">–</span></div>
     </div>
 
     <!-- INLINE AI CONFIRMATION PROMPT -->
@@ -705,7 +804,18 @@
     </div>
     <button class="save-btn" id="btnSave">Save Settings</button>
     <div class="hint">Keys are stored per-provider, locally in your browser, and are only ever sent directly to that provider's API — never to us or anywhere else.</div>
-    <div class="hint">After saving, go to Main tab → Extract → AI Compress to use your key.</div>
+    
+    <!-- DEVELOPER ATTRIBUTION & REPO EXPOSURE -->
+    <div class="dev-card">
+      <div class="dev-info">
+        <span class="dev-title">ChatBridge &bull; Open Source</span>
+        <span class="dev-sub">Built with 💜 by <b>Rajiv Khurana</b></span>
+      </div>
+      <div class="dev-links">
+        <a href="https://github.com/Rajivkhurana/Chat-Bridge" target="_blank" class="dev-link-btn">⭐ Star on GitHub</a>
+        <a href="https://github.com/Rajivkhurana" target="_blank" class="dev-link-btn sec">🐙 @Rajivkhurana</a>
+      </div>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>

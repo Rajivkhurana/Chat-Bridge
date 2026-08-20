@@ -1,54 +1,70 @@
 // popup.js v2
 
 const TARGET_URLS = {
-  chatgpt:"https://chatgpt.com/",
-  claude:"https://claude.ai/new",
-  gemini:"https://gemini.google.com/app",
-  perplexity:"https://www.perplexity.ai/"
+  chatgpt: "https://chatgpt.com/",
+  claude: "https://claude.ai/new",
+  gemini: "https://gemini.google.com/app",
+  perplexity: "https://www.perplexity.ai/"
 };
 
 // Every provider here exposes an OpenAI-compatible /chat/completions endpoint
 // (actual request lives in background.js — this is just UI metadata).
 const PROVIDERS = {
-  openrouter: { label:"OpenRouter", keyPlaceholder:"sk-or-v1-…", helpUrl:"https://openrouter.ai",
-    models:["mistralai/mistral-7b-instruct","google/gemma-3-4b-it:free","meta-llama/llama-3.1-8b-instruct","anthropic/claude-3-haiku","openai/gpt-4o-mini"] },
-  nvidia: { label:"NVIDIA NIM", keyPlaceholder:"nvapi-…", helpUrl:"https://build.nvidia.com",
-    models:["meta/llama-3.1-8b-instruct","meta/llama-3.1-70b-instruct","mistralai/mistral-7b-instruct-v0.3","nvidia/nemotron-4-340b-instruct"] },
-  groq: { label:"Groq", keyPlaceholder:"gsk_…", helpUrl:"https://console.groq.com/keys",
-    models:["llama-3.1-8b-instant","llama-3.3-70b-versatile","mixtral-8x7b-32768","gemma2-9b-it"] },
-  together: { label:"Together AI", keyPlaceholder:"…", helpUrl:"https://api.together.ai",
-    models:["meta-llama/Llama-3.1-8B-Instruct-Turbo","mistralai/Mixtral-8x7B-Instruct-v0.1","Qwen/Qwen2.5-7B-Instruct-Turbo"] },
-  fireworks: { label:"Fireworks AI", keyPlaceholder:"fw_…", helpUrl:"https://fireworks.ai",
-    models:["accounts/fireworks/models/llama-v3p1-8b-instruct","accounts/fireworks/models/mixtral-8x7b-instruct"] },
-  deepinfra: { label:"DeepInfra", keyPlaceholder:"…", helpUrl:"https://deepinfra.com",
-    models:["meta-llama/Meta-Llama-3.1-8B-Instruct","mistralai/Mistral-7B-Instruct-v0.3"] },
-  mistral: { label:"Mistral AI", keyPlaceholder:"…", helpUrl:"https://console.mistral.ai",
-    models:["mistral-small-latest","mistral-large-latest","open-mistral-nemo"] },
-  openai: { label:"OpenAI", keyPlaceholder:"sk-…", helpUrl:"https://platform.openai.com/api-keys",
-    models:["gpt-4o-mini","gpt-4o","gpt-4.1-mini"] }
+  openrouter: {
+    label: "OpenRouter", keyPlaceholder: "sk-or-v1-…", helpUrl: "https://openrouter.ai",
+    models: ["mistralai/mistral-7b-instruct", "google/gemma-3-4b-it:free", "meta-llama/llama-3.1-8b-instruct", "anthropic/claude-3-haiku", "openai/gpt-4o-mini"]
+  },
+  nvidia: {
+    label: "NVIDIA NIM", keyPlaceholder: "nvapi-…", helpUrl: "https://build.nvidia.com",
+    models: ["meta/llama-3.1-8b-instruct", "meta/llama-3.1-70b-instruct", "mistralai/mistral-7b-instruct-v0.3", "nvidia/nemotron-4-340b-instruct"]
+  },
+  groq: {
+    label: "Groq (Fastest ⚡)", keyPlaceholder: "gsk_…", helpUrl: "https://console.groq.com/keys",
+    models: ["llama-3.1-8b-instant", "llama-3.3-70b-versatile", "mixtral-8x7b-32768", "gemma2-9b-it"]
+  },
+  together: {
+    label: "Together AI", keyPlaceholder: "…", helpUrl: "https://api.together.ai",
+    models: ["meta-llama/Llama-3.1-8B-Instruct-Turbo", "mistralai/Mixtral-8x7B-Instruct-v0.1", "Qwen/Qwen2.5-7B-Instruct-Turbo"]
+  },
+  fireworks: {
+    label: "Fireworks AI", keyPlaceholder: "fw_…", helpUrl: "https://fireworks.ai",
+    models: ["accounts/fireworks/models/llama-v3p1-8b-instruct", "accounts/fireworks/models/mixtral-8x7b-instruct"]
+  },
+  deepinfra: {
+    label: "DeepInfra", keyPlaceholder: "…", helpUrl: "https://deepinfra.com",
+    models: ["meta-llama/Meta-Llama-3.1-8B-Instruct", "mistralai/Mistral-7B-Instruct-v0.3"]
+  },
+  mistral: {
+    label: "Mistral AI", keyPlaceholder: "…", helpUrl: "https://console.mistral.ai",
+    models: ["mistral-small-latest", "mistral-large-latest", "open-mistral-nemo"]
+  },
+  openai: {
+    label: "OpenAI", keyPlaceholder: "sk-…", helpUrl: "https://platform.openai.com/api-keys",
+    models: ["gpt-4o-mini", "gpt-4o", "gpt-4.1-mini"]
+  }
 };
 
-let state = { mode:"smart", target:"chatgpt", rawMessages:[], pageContext:null, compressed:"" };
+let state = { mode: "smart", target: "chatgpt", rawMessages: [], pageContext: null, compressed: "" };
 let providerSettings = {}; // { [providerId]: { key, model } }
 
-const $dot       = document.getElementById("dot");
-const $stxt      = document.getElementById("stxt");
-const $preview   = document.getElementById("preview");
-const $stats     = document.getElementById("stats");
-const $tOrig     = document.getElementById("tOrig");
-const $tComp     = document.getElementById("tComp");
-const $tSaved    = document.getElementById("tSaved");
-const $btnExtract= document.getElementById("btnExtract");
-const $btnAI     = document.getElementById("btnAI");
-const $btnSend   = document.getElementById("btnSend");
-const $toast     = document.getElementById("toast");
-const $orProvider= document.getElementById("orProvider");
-const $orKey     = document.getElementById("orKey");
-const $orKeyLabel= document.getElementById("orKeyLabel");
+const $dot = document.getElementById("dot");
+const $stxt = document.getElementById("stxt");
+const $preview = document.getElementById("preview");
+const $stats = document.getElementById("stats");
+const $tOrig = document.getElementById("tOrig");
+const $tComp = document.getElementById("tComp");
+const $tSaved = document.getElementById("tSaved");
+const $btnExtract = document.getElementById("btnExtract");
+const $btnAI = document.getElementById("btnAI");
+const $btnSend = document.getElementById("btnSend");
+const $toast = document.getElementById("toast");
+const $orProvider = document.getElementById("orProvider");
+const $orKey = document.getElementById("orKey");
+const $orKeyLabel = document.getElementById("orKeyLabel");
 const $orKeyHint = document.getElementById("orKeyHint");
-const $orModel   = document.getElementById("orModel");
+const $orModel = document.getElementById("orModel");
 const $modelOpts = document.getElementById("modelOptions");
-const $orPrompt  = document.getElementById("orPrompt");
+const $orPrompt = document.getElementById("orPrompt");
 
 let currentTab = null;
 
@@ -91,17 +107,17 @@ chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
 // ── Tabs ──────────────────────────────────────────────────────────────────────
 document.querySelectorAll(".tab").forEach(t => {
   t.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
     t.classList.add("active");
-    document.querySelectorAll(".panel").forEach(p=>p.classList.add("hidden"));
-    document.getElementById("panel-"+t.dataset.panel).classList.remove("hidden");
+    document.querySelectorAll(".panel").forEach(p => p.classList.add("hidden"));
+    document.getElementById("panel-" + t.dataset.panel).classList.remove("hidden");
   });
 });
 
 // ── Load saved settings ───────────────────────────────────────────────────────
 let selectedProviderId = "openrouter";
 
-chrome.storage.local.get(["providerSettings","selectedProvider","orPrompt"], (d) => {
+chrome.storage.local.get(["providerSettings", "selectedProvider", "orPrompt"], (d) => {
   providerSettings = d.providerSettings || {};
   selectedProviderId = d.selectedProvider && PROVIDERS[d.selectedProvider] ? d.selectedProvider : "openrouter";
   $orProvider.value = selectedProviderId;
@@ -203,7 +219,7 @@ document.querySelectorAll(".tbtn").forEach(el => {
 
 // ── EXTRACT ───────────────────────────────────────────────────────────────────
 $btnExtract.addEventListener("click", async () => {
-  setLoading($btnExtract, true);
+  setLoading($btnExtract, true, '<span class="stepno">1</span>⬇ Extract', 'Extracting…');
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     currentTab = tab;
@@ -239,6 +255,7 @@ $btnExtract.addEventListener("click", async () => {
     renderCompressed();
     $btnSend.disabled = false;
     updateAiButtonState();
+    showToast(`✨ ${getSWQuote("extract")} (${msgs.length} msgs)`);
   } catch (err) {
     const isRestricted = err.message?.includes("Cannot access") || err.message?.includes("restricted");
     showStatus("err", isRestricted ? "Can't read this tab (restricted browser page)" : "Extraction error — try refreshing the chat page");
@@ -489,10 +506,10 @@ function compress(msgs, mode) {
 function roleIcon(role) { return role === "human" ? "👤 " : role === "assistant" ? "🤖 " : "❔ "; }
 function roleTag(role) { return role === "human" ? "U:" : role === "assistant" ? "A:" : "?:"; }
 
-const $aiPrompt      = document.getElementById("aiPrompt");
-const $btnWaitAi     = document.getElementById("btnWaitAi");
-const $btnSendCurrent= document.getElementById("btnSendCurrent");
-let isAiCompressing  = false;
+const $aiPrompt = document.getElementById("aiPrompt");
+const $btnWaitAi = document.getElementById("btnWaitAi");
+const $btnSendCurrent = document.getElementById("btnSendCurrent");
+let isAiCompressing = false;
 
 const FILLERS = [
   /^(sure[,!]?\s*)/i, /^(of course[,!]?\s*)/i, /^(certainly[,!]?\s*)/i,
@@ -555,7 +572,7 @@ function renderCompressed() {
 $btnAI.addEventListener("click", async () => {
   if (!state.rawMessages.length) { showToast("Extract first!"); return; }
 
-  const d = await chrome.storage.local.get(["providerSettings","selectedProvider","orPrompt"]);
+  const d = await chrome.storage.local.get(["providerSettings", "selectedProvider", "orPrompt"]);
   const providerId = d.selectedProvider && PROVIDERS[d.selectedProvider] ? d.selectedProvider : "openrouter";
   const saved = (d.providerSettings || {})[providerId] || {};
   const key = saved.key;
@@ -571,22 +588,23 @@ $btnAI.addEventListener("click", async () => {
   }).join("\n\n");
 
   const systemPrompt = customPrompt ||
-`You are ChatBridge, an expert AI context compressor. Your job is to compress a conversation transcript between a User and an AI into a high-accuracy, high-density Context Bridge for another AI model.
+    `You are ChatBridge, an expert AI context compressor. Your job is to compress a conversation transcript between a User and an AI into a high-accuracy, high-density Engineering Context & Decision Handoff for another AI model to seamlessly continue the work.
 
-Analyze the entire conversation accurately and output a structured brief formatted exactly as:
+Analyze the entire conversation narrative accurately and output a structured brief formatted exactly as:
 
-[Context from Previous Chat]
-• User Goal / Question: <State the exact problem, question, or goal requested by the user>
-• Solution / Conclusion: <State the accurate technical decisions, explanations, and conclusions reached>
-• Key Code / Specs: <Include all essential code, snippets, commands, or data structures with exact syntax. Do not alter or omit critical logic>
-• Current Status / Next Task: <State what was just completed and what the user needs next>
+[AI Context & Decision Handoff]
+• Goal & Problem: <State the exact problem, user requirements, constraints, and objective>
+• Decisions & Alternatives Evaluated: <Narrate what was done, what options were proposed, what was accepted, and what was REJECTED and why>
+• Working Implementation & Code: <Include all key code blocks, algorithms, commands, or data structures with exact syntax. Do not truncate, omit, or alter logic>
+• Current Status & Next Move: <State where the conversation left off and the exact immediate next task/question for the receiving AI model>
 
 Rules:
-1. ACCURACY FIRST: Never hallucinate, alter variable names, or omit critical algorithmic details or code logic.
-2. NO FILLER: Strip conversational greetings, pleasantries, apologies, and meta-commentary (do NOT write "Full Chat Context", "Output method", or explain your formatting).
-3. Plain text with standard markdown code blocks only.`;
+1. ACCURACY & FIDELITY: Never hallucinate, never alter variable names, and never drop critical algorithmic logic or syntax.
+2. NARRATIVE STORY: Clearly document the "why" — if an approach failed or was rejected in the chat, record it so the next AI does not repeat the mistake.
+3. NO FILLER: Strip greetings, pleasantries, apologies, and meta-commentary.
+4. Output plain text with standard markdown code blocks only.`;
 
-  setLoading($btnAI, true);
+  setLoading($btnAI, true, '<span class="stepno">2</span>✦ AI Compress', 'Summarizing…');
   isAiCompressing = true;
   try {
     const result = await chrome.runtime.sendMessage({
@@ -605,55 +623,95 @@ Rules:
 
     const orig = estTok(fullTranscript);
     const comp = estTok(summary);
-    const saved = Math.max(0,orig-comp);
-    const pct = orig>0?Math.round(saved/orig*100):0;
-    $stats.style.display="flex";
-    $tOrig.textContent=orig.toLocaleString();
-    $tComp.textContent=comp.toLocaleString();
-    $tSaved.textContent=`${saved.toLocaleString()} (${pct}%)`;
-    $btnSend.disabled=false;
+    const saved = Math.max(0, orig - comp);
+    const pct = orig > 0 ? Math.round(saved / orig * 100) : 0;
+    $stats.style.display = "flex";
+    $tOrig.textContent = orig.toLocaleString();
+    $tComp.textContent = comp.toLocaleString();
+    $tSaved.textContent = `${saved.toLocaleString()} (${pct}%)`;
+    $btnSend.disabled = false;
     $aiPrompt.classList.add("hidden");
-    showToast(`✦ AI compressed! ${pct}% saved`);
-  } catch(e) {
-    showToast("❌ Error: "+e.message.slice(0,50));
+    showToast(`✦ AI compressed! This is the way. (${pct}% saved)`);
+  } catch (e) {
+    showToast("❌ Error: " + e.message.slice(0, 50));
   } finally {
     isAiCompressing = false;
     setLoading($btnAI, false, '<span class="stepno">2</span>✦ AI Compress');
   }
 });
 
+const SW_QUOTES = {
+  extract: [
+    "The Force is strong with this transcript 📜",
+    "Help me, Obi-Wan Kenobi. You're my only hope ✨",
+    "I've got a good feeling about this! 🟢",
+    "A fine addition to my collection! 🔍"
+  ],
+  compress: [
+    "This is the way. ✨",
+    "Never tell me the odds! 🎯",
+    "Do or do not, there is no try. 🪐",
+    "These aren't the tokens you're looking for 👋",
+    "Mind tricks worked! Useless tokens vaporized ⚡"
+  ],
+  send: [
+    "Punch it, Chewie! 🚀",
+    "Hyperspace jump complete! 🛸",
+    "Making the Kessel Run in less than 12 parsecs 🌌",
+    "Great shot, kid! That was one in a million 🎯",
+    "Stay on target… Context delivered! 📡"
+  ],
+  copy: [
+    "These ARE the tokens you're looking for 📋✨",
+    "The context will be with you, always 🌌",
+    "Your focus determines your reality. Copied! ⚔️",
+    "Power! Unlimited power! ⚡"
+  ],
+  easterEgg: [
+    "⚔️ Kyber Crystal Activated! May the Force be with your tokens!",
+    "⚔️ I am one with the Force, and the Force is with me!",
+    "⚔️ The Force will be with you. Always.",
+    "⚔️ You underestimate my token efficiency!"
+  ]
+};
+
+function getSWQuote(category) {
+  const list = SW_QUOTES[category] || SW_QUOTES.compress;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
 // ── SEND ACTION HELPER ────────────────────────────────────────────────────────
 async function executeSend() {
   if (!state.compressed) return;
-  setLoading($btnSend, true);
+  setLoading($btnSend, true, '<span class="stepno">3</span>Send →', 'Sending…');
 
-  if (state.target==="clipboard") {
+  if (state.target === "clipboard") {
     try { await navigator.clipboard.writeText(state.compressed); }
-    catch(_){
-      const ta=Object.assign(document.createElement("textarea"),{value:state.compressed});
+    catch (_) {
+      const ta = Object.assign(document.createElement("textarea"), { value: state.compressed });
       document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
     }
-    showToast("📋 Copied! Paste with Ctrl+V");
-    setLoading($btnSend,false,'<span class="stepno">3</span>Send →');
+    showToast(`📋 ${getSWQuote("copy")}`);
+    setLoading($btnSend, false, '<span class="stepno">3</span>Send →');
     return;
   }
 
   const text = state.compressed;
-  const url  = TARGET_URLS[state.target];
+  const url = TARGET_URLS[state.target];
   let existingTabId = null;
   try {
     if (currentTab?.url && getTargetForHost(new URL(currentTab.url).hostname) === state.target) {
       existingTabId = currentTab.id;
     }
-  } catch(_){}
+  } catch (_) { }
   try {
-    showToast(existingTabId ? "⏳ Pasting into this tab…" : "⏳ Opening "+state.target+"…");
-    const result = await chrome.runtime.sendMessage({ action:"openAndInject", url, text, existingTabId });
-    showToast(result?.success ? "🚀 Pasted into "+state.target+"!" : "⚠️ Opened, but paste failed");
-  } catch(_) {
+    showToast(existingTabId ? "⏳ Pasting into this tab…" : `⏳ Hyperspace jump to ${state.target}…`);
+    const result = await chrome.runtime.sendMessage({ action: "openAndInject", url, text, existingTabId });
+    showToast(result?.success ? `🚀 ${getSWQuote("send")} (${state.target})` : "⚠️ Opened, but paste failed");
+  } catch (_) {
     showToast("⚠️ Auto-paste failed — use Copy mode");
   }
-  setLoading($btnSend,false,'<span class="stepno">3</span>Send →');
+  setLoading($btnSend, false, '<span class="stepno">3</span>Send →');
 }
 
 // ── SEND ──────────────────────────────────────────────────────────────────────
@@ -667,7 +725,7 @@ $btnSend.addEventListener("click", () => {
 
 $btnWaitAi.addEventListener("click", () => {
   $aiPrompt.classList.add("hidden");
-  showToast("⏳ Waiting for AI summary to complete…");
+  showToast("⏳ Stay on target… Waiting for AI summary");
 });
 
 $btnSendCurrent.addEventListener("click", () => {
@@ -675,13 +733,37 @@ $btnSendCurrent.addEventListener("click", () => {
   executeSend();
 });
 
+// ── Easter Egg: Kyber Crystal Lightsaber Glow ────────────────────────────────
+let logoClickCount = 0;
+let logoClickTimer = null;
+const $logoEl = document.querySelector(".logo");
+if ($logoEl) {
+  $logoEl.style.cursor = "pointer";
+  $logoEl.addEventListener("click", () => {
+    logoClickCount++;
+    clearTimeout(logoClickTimer);
+    logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 1200);
+    if (logoClickCount >= 4) {
+      logoClickCount = 0;
+      $logoEl.classList.toggle("kyber-glow");
+      const active = $logoEl.classList.contains("kyber-glow");
+      showToast(active ? getSWQuote("easterEgg") : "🌌 Returned from Hyperspace");
+    }
+  });
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function setLoading(btn, on, label) {
+function setLoading(btn, on, label, loadingText) {
   btn.disabled = on;
-  btn.innerHTML = on ? '<span class="spin"></span>' : label;
+  btn.classList.toggle("loading", on);
+  if (on) {
+    btn.innerHTML = `<span class="spin"></span>${loadingText || "…"}`;
+  } else if (label) {
+    btn.innerHTML = label;
+  }
 }
 function showToast(msg) {
-  $toast.textContent=msg;
+  $toast.textContent = msg;
   $toast.classList.add("show");
-  setTimeout(()=>$toast.classList.remove("show"),3000);
+  setTimeout(() => $toast.classList.remove("show"), 3000);
 }
