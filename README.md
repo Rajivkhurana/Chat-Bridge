@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./icons/icon128.png" width="96" height="96" alt="ChatBridge Logo" />
+  <img src="https://raw.githubusercontent.com/Rajivkhurana/Chat-Bridge/master/icons/icon128.png" width="96" height="96" alt="ChatBridge Logo" />
 </p>
 
 <h1 align="center">ChatBridge</h1>
@@ -13,9 +13,9 @@
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="./store-assets/screenshot-1-extract.png" width="32%" alt="Extract Chat" />
-  <img src="./store-assets/screenshot-2-compress-and-send.png" width="32%" alt="Compress and Send" />
-  <img src="./store-assets/screenshot-3-bring-your-own-key.png" width="32%" alt="BYOK Settings" />
+  <img src="https://raw.githubusercontent.com/Rajivkhurana/Chat-Bridge/master/store-assets/screenshot-1-extract.png" width="32%" alt="Extract Chat" />
+  <img src="https://raw.githubusercontent.com/Rajivkhurana/Chat-Bridge/master/store-assets/screenshot-2-compress-and-send.png" width="32%" alt="Compress and Send" />
+  <img src="https://raw.githubusercontent.com/Rajivkhurana/Chat-Bridge/master/store-assets/screenshot-3-bring-your-own-key.png" width="32%" alt="BYOK Settings" />
 </p>
 
 ---
