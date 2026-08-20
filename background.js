@@ -199,7 +199,8 @@ async function aiCompress(provider, key, model, systemPrompt, rawText) {
           { role: "system", content: systemPrompt },
           { role: "user", content: `Compress this conversation:\n\n${rawText}` }
         ],
-        max_tokens: 600
+        temperature: 0.1,
+        max_tokens: 350
       })
     });
   } catch (_e) {

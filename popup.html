@@ -30,28 +30,29 @@
       background: var(--bg);
       color: var(--text);
       font-family: var(--font-sans);
-      font-size: 12px;
-      line-height: 1.5;
+      font-size: 11.5px;
+      line-height: 1.4;
+      overflow-x: hidden;
     }
     
     .header {
       background: var(--surf);
       border-bottom: 1px solid var(--border);
-      padding: 12px 14px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+      gap: 8px;
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
     }
     .logo {
-      width: 26px;
-      height: 26px;
-      border-radius: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
       overflow: hidden;
     }
     .logo img {
@@ -62,7 +63,7 @@
     .title {
       font-family: var(--font-display);
       font-weight: 800;
-      font-size: 15px;
+      font-size: 14px;
       letter-spacing: -0.3px;
       color: var(--text);
     }
@@ -72,9 +73,9 @@
     .tabs {
       margin-left: auto;
       display: flex;
-      gap: 4px;
+      gap: 3px;
       background: #f1f5f9;
-      padding: 3px;
+      padding: 2px;
       border-radius: 6px;
     }
     .tab {
@@ -85,7 +86,7 @@
       font-family: var(--font-sans);
       font-weight: 500;
       font-size: 10px;
-      padding: 3px 8px;
+      padding: 2px 8px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -96,10 +97,10 @@
     }
 
     .panel {
-      padding: 14px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
     .panel.hidden {
       display: none;
@@ -108,8 +109,8 @@
     .status {
       background: var(--surf);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 6px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -132,7 +133,7 @@
       box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
     }
     .status-text {
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--muted);
     }
     .status-text b {
@@ -141,26 +142,26 @@
     }
 
     .lbl {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       letter-spacing: 0.8px;
       color: var(--muted);
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     
     .grid2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
+      gap: 5px;
     }
     .opt {
       background: var(--surf);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 6px;
+      padding: 6px 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
       user-select: none;
       box-shadow: var(--shadow-sm);
       display: flex;
@@ -180,26 +181,26 @@
       outline-offset: 1px;
     }
     .opt-t {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text);
-      margin-bottom: 2px;
+      margin-bottom: 1px;
     }
     .opt-d {
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--muted);
-      line-height: 1.35;
+      line-height: 1.25;
       flex-grow: 1;
     }
     .opt-b {
       display: inline-block;
       align-self: flex-start;
-      margin-top: 6px;
-      font-size: 9px;
+      margin-top: 3px;
+      font-size: 8.5px;
       font-family: var(--font-mono);
       font-weight: 500;
-      padding: 1px 6px;
-      border-radius: 4px;
+      padding: 1px 4px;
+      border-radius: 3px;
       background: rgba(99, 102, 241, 0.08);
       color: var(--accent);
     }
@@ -209,22 +210,26 @@
     
     .target-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
     }
     .tbtn {
       background: var(--surf);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 4px;
+      border-radius: 6px;
+      padding: 5px 2px;
       cursor: pointer;
       text-align: center;
       color: var(--muted);
       font-family: var(--font-sans);
       font-weight: 500;
-      font-size: 11px;
-      transition: all 0.2s ease;
+      font-size: 9.5px;
+      transition: all 0.15s ease;
       box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
     }
     .tbtn:hover {
       border-color: #cbd5e1;
@@ -233,26 +238,26 @@
     .tbtn.sel {
       border-color: var(--accent);
       color: var(--text);
-      background: rgba(99, 102, 241, 0.04);
+      background: rgba(99, 102, 241, 0.05);
       font-weight: 600;
     }
-    .tbtn-i {
-      font-size: 14px;
-      display: block;
-      margin-bottom: 2px;
+    .tbtn svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
     }
 
     .preview {
       background: #f8fafc;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      min-height: 70px;
-      max-height: 130px;
+      border-radius: 6px;
+      padding: 7px 9px;
+      min-height: 55px;
+      max-height: 75px;
       overflow-y: auto;
       font-family: var(--font-mono);
-      font-size: 10.5px;
-      line-height: 1.5;
+      font-size: 10px;
+      line-height: 1.4;
       color: #334155;
       white-space: pre-wrap;
       word-break: break-word;
@@ -272,19 +277,19 @@
     
     .stats {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       align-items: center;
       flex-wrap: wrap;
     }
     .pill {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       background: var(--surf);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 10px;
-      font-size: 11px;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 10px;
       box-shadow: var(--shadow-sm);
     }
     .pill .l {
@@ -305,22 +310,22 @@
     }
     .arrow {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10px;
     }
 
     .actions {
       display: flex;
-      gap: 6px;
+      gap: 5px;
     }
     .btn {
       flex: 1;
       min-width: 0;
-      padding: 10px 6px;
-      border-radius: 8px;
+      padding: 8px 4px;
+      border-radius: 6px;
       border: none;
       cursor: pointer;
       font-family: var(--font-sans);
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
       transition: all 0.2s ease;
       display: flex;
@@ -360,95 +365,89 @@
       transform: translateY(-0.5px);
       box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
     }
-    .btn-pri:disabled, .btn-ai:disabled {
-      background: #e2e8f0;
-      color: #94a3b8;
+    .btn:disabled {
+      opacity: 0.35;
       cursor: not-allowed;
-      transform: none;
       box-shadow: none;
+      transform: none !important;
     }
     .stepno {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 12px;
-      height: 12px;
-      flex-shrink: 0;
+      display: inline-block;
+      width: 13px;
+      height: 13px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.25);
-      font-size: 8px;
-      font-family: var(--font-mono);
+      background: rgba(0, 0, 0, 0.12);
+      font-size: 8.5px;
+      font-weight: 700;
+      line-height: 13px;
+      text-align: center;
+      margin-right: 1px;
     }
-    .btn-sec .stepno { background: rgba(15, 23, 42, 0.08); color: var(--text); }
-    .btn-pri:disabled .stepno, .btn-ai:disabled .stepno { background: rgba(15, 23, 42, 0.06); color: #94a3b8; }
 
     /* Settings panel */
     .setting-row {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
     .setting-row label {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      text-transform: uppercase;
     }
     .inp {
       background: var(--surf);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 9px 12px;
+      border-radius: 6px;
+      padding: 7px 10px;
       color: var(--text);
-      font-family: var(--font-sans);
-      font-size: 12px;
-      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 11px;
       outline: none;
       transition: all 0.2s ease;
+      width: 100%;
       box-shadow: var(--shadow-sm);
     }
     .inp:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
     }
-    textarea.inp {
-      font-family: var(--font-mono);
-      font-size: 11px;
-    }
-    .inp::placeholder {
-      color: #cbd5e1;
-    }
-    select.inp {
-      cursor: pointer;
-    }
     .key-wrap {
       position: relative;
+      display: flex;
+      align-items: center;
     }
     .key-wrap .inp {
-      padding-right: 34px;
+      padding-right: 32px;
     }
     .key-toggle {
       position: absolute;
-      right: 4px;
-      top: 50%;
-      transform: translateY(-50%);
+      right: 6px;
       background: transparent;
       border: none;
+      color: var(--muted);
       cursor: pointer;
-      font-size: 13px;
-      padding: 4px 6px;
-      opacity: 0.5;
+      font-size: 12px;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.6;
       transition: opacity 0.15s ease;
     }
     .key-toggle:hover { opacity: 0.9; }
     .save-btn {
       background: var(--surf);
       border: 1px solid var(--accent);
-      border-radius: 8px;
-      padding: 10px;
+      border-radius: 6px;
+      padding: 8px;
       color: var(--accent);
       font-family: var(--font-sans);
       font-weight: 600;
-      font-size: 12px;
+      font-size: 11.5px;
       cursor: pointer;
       width: 100%;
       transition: all 0.2s ease;
@@ -460,9 +459,9 @@
       border-color: #4f46e5;
     }
     .hint {
-      font-size: 10px;
+      font-size: 9.5px;
       color: var(--muted);
-      line-height: 1.4;
+      line-height: 1.35;
     }
     .hint a {
       color: var(--accent);
@@ -483,7 +482,7 @@
       font-family: var(--font-sans);
       font-weight: 500;
       font-size: 11px;
-      padding: 8px 16px;
+      padding: 6px 14px;
       border-radius: 20px;
       opacity: 0;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -510,6 +509,58 @@
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.6s linear infinite;
+    }
+    .ai-prompt {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-left: 3px solid #f59e0b;
+      border-radius: 6px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+      animation: slidePrompt 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slidePrompt {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .ai-prompt.hidden { display: none; }
+    .ai-prompt-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ai-prompt-desc {
+      font-size: 10px;
+      color: #78350f;
+      line-height: 1.3;
+    }
+    .ai-prompt-btns {
+      display: flex;
+      gap: 5px;
+    }
+    .ai-prompt-btns .btn {
+      padding: 5px 6px;
+      font-size: 10px;
+    }
+    .btn-wait {
+      background: #ffffff;
+      border: 1px solid #d97706;
+      color: #b45309;
+      font-weight: 600;
+    }
+    .btn-wait:hover {
+      background: #fef3c7;
+    }
+    .btn-send-current {
+      background: linear-gradient(135deg, var(--accent), #4f46e5);
+      color: #ffffff;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -544,11 +595,44 @@
     <div>
       <div class="lbl">Send To</div>
       <div class="target-row">
-        <button class="tbtn sel" data-target="chatgpt"><span class="tbtn-i">🤖</span>ChatGPT</button>
-        <button class="tbtn" data-target="claude"><span class="tbtn-i">🟠</span>Claude</button>
-        <button class="tbtn" data-target="gemini"><span class="tbtn-i">💎</span>Gemini</button>
-        <button class="tbtn" data-target="perplexity"><span class="tbtn-i">🔎</span>Perplexity</button>
-        <button class="tbtn" data-target="clipboard"><span class="tbtn-i">📋</span>Copy</button>
+        <!-- ChatGPT -->
+        <button class="tbtn sel" data-target="chatgpt" title="Send to ChatGPT">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/>
+            <path d="M12 6v12M6 12h12"/>
+          </svg>
+          ChatGPT
+        </button>
+        <!-- Claude -->
+        <button class="tbtn" data-target="claude" title="Send to Claude">
+          <svg viewBox="0 0 24 24" fill="#d97706">
+            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/>
+          </svg>
+          Claude
+        </button>
+        <!-- Gemini -->
+        <button class="tbtn" data-target="gemini" title="Send to Gemini">
+          <svg viewBox="0 0 24 24" fill="#2563eb">
+            <path d="M12 2C12 7.523 7.523 12 2 12C7.523 12 12 16.477 12 22C12 16.477 16.477 12 22 12C16.477 12 12 7.523 12 2Z"/>
+          </svg>
+          Gemini
+        </button>
+        <!-- Perplexity -->
+        <button class="tbtn" data-target="perplexity" title="Send to Perplexity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Perplexity
+        </button>
+        <!-- Copy -->
+        <button class="tbtn" data-target="clipboard" title="Copy to Clipboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copy
+        </button>
       </div>
     </div>
 
@@ -562,6 +646,21 @@
       <span class="arrow">→</span>
       <div class="pill"><span class="l">compressed</span><span class="v" id="tComp">–</span></div>
       <div class="pill g"><span class="l">saved</span><span class="v" id="tSaved">–</span></div>
+    </div>
+
+    <!-- INLINE AI CONFIRMATION PROMPT -->
+    <div class="ai-prompt hidden" id="aiPrompt">
+      <div class="ai-prompt-title">
+        <span class="spin" style="border-color: rgba(180,83,9,0.3); border-top-color: #b45309;"></span>
+        AI is still compressing…
+      </div>
+      <div class="ai-prompt-desc">
+        Do you want to wait for the AI summary, or send the local version we have now?
+      </div>
+      <div class="ai-prompt-btns">
+        <button type="button" class="btn btn-wait" id="btnWaitAi">⏳ Wait for AI</button>
+        <button type="button" class="btn btn-send-current" id="btnSendCurrent">⚡ Send Current</button>
+      </div>
     </div>
 
     <div class="actions">
