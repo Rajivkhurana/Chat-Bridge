@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ChatBridge — 1-Click Cross-AI Context & Decision Handoff</title>
-  <meta name="description" content="Open-source browser extension to move AI conversations across Claude, ChatGPT, Gemini, and Perplexity with zero context loss and zero token waste." />
-  
+  <meta name="description"
+    content="Open-source browser extension to move AI conversations across Claude, ChatGPT, Gemini, and Perplexity with zero context loss and zero token waste." />
+
   <!-- Open Graph Meta -->
   <meta property="og:title" content="ChatBridge — 1-Click Cross-AI Context & Decision Handoff" />
-  <meta property="og:description" content="Move AI conversations across models with zero context loss and -65% token waste. 100% private, client-side, and open source." />
+  <meta property="og:description"
+    content="Move AI conversations across models with zero context loss and -65% token waste. 100% private, client-side, and open source." />
   <meta property="og:image" content="store-assets/screenshot-1-extract.png" />
   <meta property="og:type" content="website" />
 
   <link rel="icon" type="image/png" href="icons/icon48.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
 
   <style>
     :root {
       --bg: #07090e;
       --bg-surface: #0d121d;
-      --bg-card: rgba(15, 22, 36, 0.65);
-      --bg-glass: rgba(20, 29, 48, 0.45);
+      --bg-card: rgba(15, 22, 36, 0.7);
+      --bg-glass: rgba(20, 29, 48, 0.5);
       --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(99, 102, 241, 0.35);
+      --border-hover: rgba(99, 102, 241, 0.45);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --text-dim: #64748b;
+      --code-color: #a5b4fc;
       --primary: #6366f1;
       --primary-glow: rgba(99, 102, 241, 0.4);
       --accent-purple: #a855f7;
@@ -35,9 +41,22 @@
       --accent-emerald: #10b981;
       --gradient-brand: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
       --gradient-cyan: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-      --gradient-dark: linear-gradient(180deg, rgba(13, 18, 29, 0.8) 0%, rgba(7, 9, 14, 0.95) 100%);
       --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    /* Light Theme Palette */
+    body.light-theme {
+      --bg: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --bg-glass: rgba(241, 245, 249, 0.85);
+      --border: rgba(0, 0, 0, 0.08);
+      --border-hover: rgba(99, 102, 241, 0.45);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --code-color: #4338ca;
     }
 
     * {
@@ -54,9 +73,10 @@
       background-color: var(--bg);
       color: var(--text-main);
       font-family: var(--font-sans);
-      line-height: 1.6;
+      line-height: 1.55;
       overflow-x: hidden;
       position: relative;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     /* Ambient Glowing Mesh Background */
@@ -74,31 +94,36 @@
     .glow-orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(130px);
+      filter: blur(120px);
       opacity: 0.22;
       animation: floatOrb 20s infinite alternate ease-in-out;
+      transition: opacity 0.3s ease;
+    }
+
+    body.light-theme .glow-orb {
+      opacity: 0.1;
     }
 
     .glow-1 {
-      width: 600px;
-      height: 600px;
+      width: 550px;
+      height: 550px;
       background: #6366f1;
-      top: -100px;
+      top: -80px;
       left: 15%;
     }
 
     .glow-2 {
-      width: 500px;
-      height: 500px;
+      width: 480px;
+      height: 480px;
       background: #a855f7;
-      top: 30%;
+      top: 35%;
       right: 5%;
       animation-delay: -5s;
     }
 
     .glow-3 {
-      width: 550px;
-      height: 550px;
+      width: 500px;
+      height: 500px;
       background: #06b6d4;
       bottom: 5%;
       left: 20%;
@@ -106,9 +131,17 @@
     }
 
     @keyframes floatOrb {
-      0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(60px, 40px) scale(1.1); }
-      100% { transform: translate(-40px, 70px) scale(0.95); }
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+
+      50% {
+        transform: translate(50px, 30px) scale(1.08);
+      }
+
+      100% {
+        transform: translate(-30px, 50px) scale(0.96);
+      }
     }
 
     /* Grid Overlay */
@@ -122,10 +155,14 @@
       opacity: 0.6;
     }
 
+    body.light-theme .grid-bg {
+      background-image: radial-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+    }
+
     .container {
-      max-width: 1200px;
+      max-width: 1140px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 20px;
       position: relative;
       z-index: 10;
     }
@@ -137,38 +174,58 @@
       z-index: 100;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      background: rgba(7, 9, 14, 0.75);
+      background: rgba(7, 9, 14, 0.85);
       border-bottom: 1px solid var(--border);
+      transition: background 0.25s ease, border-color 0.25s ease;
+    }
+
+    body.light-theme header {
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 14px rgba(0, 0, 0, 0.03);
     }
 
     .nav-wrap {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 74px;
+      height: 66px;
     }
 
     .logo-wrap {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-weight: 800;
-      font-size: 21px;
+      font-size: 20px;
       letter-spacing: -0.5px;
       text-decoration: none;
-      color: #fff;
+      color: #ffffff;
+    }
+
+    body.light-theme .logo-wrap {
+      color: #0f172a;
     }
 
     .logo-badge {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.25));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 3px;
+      box-shadow: 0 0 14px rgba(99, 102, 241, 0.4);
       transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
+    body.light-theme .logo-badge {
+      border-color: rgba(99, 102, 241, 0.2);
+      background: #ffffff;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.15);
+    }
+
     .logo-wrap:hover .logo-badge {
-      transform: scale(1.08) rotate(3deg);
+      transform: scale(1.06) rotate(3deg);
     }
 
     .logo-wrap span {
@@ -177,76 +234,172 @@
       -webkit-text-fill-color: transparent;
     }
 
+    /* Navigation Links */
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 32px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
+      gap: 24px;
     }
 
-    .nav-links a {
-      transition: color 0.2s ease;
+    .nav-links a,
+    .nav-links a:visited {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #cbd5e1;
       text-decoration: none;
+      letter-spacing: -0.1px;
+      transition: color 0.2s ease, text-shadow 0.2s ease;
     }
 
     .nav-links a:hover {
-      color: #fff;
+      color: #ffffff;
+      text-shadow: 0 0 14px rgba(99, 102, 241, 0.7);
+    }
+
+    body.light-theme .nav-links a,
+    body.light-theme .nav-links a:visited {
+      color: #334155;
+    }
+
+    body.light-theme .nav-links a:hover {
+      color: #4f46e5;
+      text-shadow: none;
     }
 
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }
 
     .btn-gh {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 9px 18px;
-      background: rgba(255, 255, 255, 0.05);
+      justify-content: center;
+      gap: 7px;
+      height: 36px;
+      padding: 0 14px;
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border);
-      border-radius: 9px;
-      font-size: 13.5px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 600;
+      font-family: inherit;
       color: #fff;
       text-decoration: none;
+      box-sizing: border-box;
       transition: all 0.2s ease;
     }
 
+    body.light-theme .btn-gh {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: #0f172a;
+    }
+
     .btn-gh:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
       transform: translateY(-1px);
     }
 
     .btn-brand {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 24px;
+      justify-content: center;
+      gap: 7px;
+      height: 36px;
+      padding: 0 18px;
       background: var(--gradient-brand);
       border: none;
-      border-radius: 9px;
-      font-size: 14px;
+      border-radius: 8px;
+      font-size: 13.5px;
       font-weight: 700;
+      font-family: inherit;
       color: #fff;
       text-decoration: none;
       cursor: pointer;
-      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+      box-sizing: border-box;
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
       transition: all 0.25s ease;
     }
 
     .btn-brand:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.55);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+    }
+
+    /* Day / Night Theme Toggle Button */
+    .theme-toggle-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    body.light-theme .theme-toggle-btn {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.1);
+      color: #0f172a;
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(99, 102, 241, 0.4);
+      color: #fff;
+      transform: scale(1.05);
+    }
+
+    body.light-theme .theme-toggle-btn .sun-icon {
+      display: none;
+    }
+
+    body.light-theme .theme-toggle-btn .moon-icon {
+      display: block;
+    }
+
+    body:not(.light-theme) .theme-toggle-btn .sun-icon {
+      display: block;
+    }
+
+    body:not(.light-theme) .theme-toggle-btn .moon-icon {
+      display: none;
+    }
+
+    /* Compact Sections */
+    section {
+      padding: 48px 0;
+    }
+
+    .sec-header {
+      text-align: center;
+      max-width: 660px;
+      margin: 0 auto 28px;
+    }
+
+    .sec-h2 {
+      font-size: clamp(26px, 3.2vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 10px;
+    }
+
+    .sec-p {
+      color: var(--text-muted);
+      font-size: 15.5px;
     }
 
     /* Hero Section */
     .hero {
-      padding: 90px 0 70px;
+      padding: 60px 0 40px;
       text-align: center;
     }
 
@@ -254,15 +407,20 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 16px;
+      padding: 5px 14px;
       background: rgba(99, 102, 241, 0.1);
       border: 1px solid rgba(99, 102, 241, 0.25);
       border-radius: 999px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       color: #a5b4fc;
-      margin-bottom: 28px;
-      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+      margin-bottom: 20px;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.12);
+    }
+
+    body.light-theme .hero-pill {
+      background: rgba(99, 102, 241, 0.08);
+      color: #4f46e5;
     }
 
     .pill-pulse {
@@ -270,23 +428,34 @@
       height: 7px;
       border-radius: 50%;
       background: var(--accent-emerald);
-      box-shadow: 0 0 10px var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
       animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.85); }
-      100% { opacity: 1; transform: scale(1); }
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.85);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .hero-h1 {
-      font-size: clamp(38px, 6vw, 68px);
+      font-size: clamp(34px, 5.2vw, 58px);
       font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -2px;
-      max-width: 950px;
-      margin: 0 auto 24px;
+      line-height: 1.12;
+      letter-spacing: -1.5px;
+      max-width: 900px;
+      margin: 0 auto 18px;
     }
 
     .hero-h1 .grad {
@@ -296,111 +465,143 @@
     }
 
     .hero-p {
-      font-size: clamp(16px, 2.2vw, 20px);
+      font-size: clamp(15.5px, 2vw, 18px);
       color: var(--text-muted);
-      max-width: 720px;
-      margin: 0 auto 40px;
-      line-height: 1.6;
+      max-width: 680px;
+      margin: 0 auto 30px;
+      line-height: 1.55;
     }
 
     .hero-btns {
       display: flex;
       justify-content: center;
-      gap: 16px;
-      margin-bottom: 60px;
+      gap: 14px;
+      margin-bottom: 40px;
       flex-wrap: wrap;
     }
 
     /* Live Interactive Extension Simulator */
     .sim-card {
-      max-width: 1000px;
+      max-width: 960px;
       margin: 0 auto;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(99, 102, 241, 0.15);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.12);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       position: relative;
+    }
+
+    body.light-theme .sim-card {
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.06);
+      border-color: rgba(0, 0, 0, 0.08);
     }
 
     .sim-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-bottom: 18px;
+      padding-bottom: 14px;
       border-bottom: 1px solid var(--border);
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .sim-dots {
       display: flex;
-      gap: 7px;
+      gap: 6px;
     }
 
     .s-dot {
-      width: 11px;
-      height: 11px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
     }
-    .s-red { background: #ef4444; }
-    .s-yel { background: #f59e0b; }
-    .s-grn { background: #10b981; }
+
+    .s-red {
+      background: #ef4444;
+    }
+
+    .s-yel {
+      background: #f59e0b;
+    }
+
+    .s-grn {
+      background: #10b981;
+    }
 
     .sim-tagline {
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
       color: #a5b4fc;
       background: rgba(99, 102, 241, 0.12);
       border: 1px solid rgba(99, 102, 241, 0.25);
-      padding: 4px 14px;
+      padding: 3px 12px;
       border-radius: 999px;
+    }
+
+    body.light-theme .sim-tagline {
+      color: #4f46e5;
     }
 
     .sim-layout {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
-      gap: 24px;
-      align-items: stretch;
+      gap: 16px;
+      align-items: center;
       text-align: left;
     }
 
     .sim-pane {
       background: rgba(8, 11, 19, 0.9);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px;
+      border-radius: 12px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      height: 310px;
+      height: 230px;
+    }
+
+    body.light-theme .sim-pane {
+      background: #f1f5f9;
+      border-color: rgba(0, 0, 0, 0.08);
     }
 
     .pane-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .model-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 10.5px;
       font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 6px;
+      padding: 2px 8px;
+      border-radius: 5px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    .badge-claude { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.3); }
-    .badge-chatgpt { background: rgba(16, 163, 127, 0.18); color: #34d399; border: 1px solid rgba(16, 163, 127, 0.3); }
+    .badge-claude {
+      background: rgba(217, 119, 6, 0.18);
+      color: #fbbf24;
+      border: 1px solid rgba(217, 119, 6, 0.3);
+    }
+
+    .badge-chatgpt {
+      background: rgba(16, 163, 127, 0.18);
+      color: #34d399;
+      border: 1px solid rgba(16, 163, 127, 0.3);
+    }
 
     .pane-token-count {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 10.5px;
       color: var(--text-dim);
     }
 
@@ -408,10 +609,19 @@
       flex: 1;
       overflow-y: auto;
       font-family: var(--font-mono);
-      font-size: 11.5px;
+      font-size: 11px;
       color: #cbd5e1;
-      line-height: 1.6;
+      line-height: 1.5;
       white-space: pre-wrap;
+    }
+
+    body.light-theme .pane-body {
+      color: #1e293b;
+    }
+
+    .code-hl {
+      color: var(--code-color);
+      font-weight: 600;
     }
 
     .sim-mid {
@@ -419,18 +629,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      padding: 0 10px;
+      gap: 12px;
     }
 
     .bridge-btn-pulse {
       background: var(--gradient-brand);
       color: #fff;
-      padding: 10px 18px;
+      padding: 8px 16px;
       border-radius: 999px;
-      font-size: 12.5px;
+      font-size: 12px;
       font-weight: 800;
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.45);
       border: none;
       cursor: pointer;
       display: flex;
@@ -448,28 +657,32 @@
       background: rgba(16, 185, 129, 0.15);
       border: 1px solid rgba(16, 185, 129, 0.35);
       color: #34d399;
-      font-size: 12px;
+      font-size: 11.5px;
       font-weight: 800;
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 4px 10px;
+      border-radius: 6px;
       white-space: nowrap;
     }
 
-    /* Ecosystem Marquee */
+    /* Ecosystem Bar */
     .ecosystem-sec {
-      padding: 40px 0;
+      padding: 30px 0;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
       background: rgba(13, 18, 29, 0.4);
       text-align: center;
     }
 
+    body.light-theme .ecosystem-sec {
+      background: rgba(241, 245, 249, 0.6);
+    }
+
     .eco-title {
-      font-size: 12.5px;
+      font-size: 11.5px;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       color: var(--text-dim);
-      margin-bottom: 24px;
+      margin-bottom: 18px;
       font-weight: 700;
     }
 
@@ -477,57 +690,43 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 36px;
+      gap: 32px;
       flex-wrap: wrap;
     }
 
     .eco-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 15px;
+      gap: 8px;
+      font-size: 14.5px;
       font-weight: 700;
       color: #94a3b8;
       transition: all 0.2s ease;
     }
 
+    body.light-theme .eco-item {
+      color: #475569;
+    }
+
     .eco-item:hover {
-      color: #fff;
+      color: var(--text-main);
       transform: translateY(-2px);
     }
 
     /* Comparison Section (Old Way vs ChatBridge) */
     .compare-sec {
-      padding: 100px 0 70px;
-    }
-
-    .sec-header {
-      text-align: center;
-      max-width: 700px;
-      margin: 0 auto 55px;
-    }
-
-    .sec-h2 {
-      font-size: clamp(28px, 4vw, 42px);
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 16px;
-    }
-
-    .sec-p {
-      color: var(--text-muted);
-      font-size: 17px;
+      padding: 50px 0;
     }
 
     .compare-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 28px;
+      gap: 20px;
     }
 
     .compare-box {
-      border-radius: 18px;
-      padding: 36px;
+      border-radius: 14px;
+      padding: 28px;
       backdrop-filter: blur(15px);
     }
 
@@ -539,165 +738,213 @@
     .box-good {
       background: rgba(16, 185, 129, 0.04);
       border: 1px solid rgba(16, 185, 129, 0.25);
-      box-shadow: 0 0 40px rgba(16, 185, 129, 0.08);
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.06);
     }
 
     .box-tag {
       display: inline-block;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 5px;
+      font-size: 10.5px;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
-    .tag-bad { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-    .tag-good { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+
+    .tag-bad {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+    }
+
+    .tag-good {
+      background: rgba(16, 185, 129, 0.18);
+      color: #34d399;
+    }
 
     .box-title {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
-      margin-bottom: 20px;
-      letter-spacing: -0.4px;
+      margin-bottom: 14px;
+      letter-spacing: -0.3px;
     }
 
     .box-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
-    .box-list li {
+    .compare-row {
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      font-size: 14.5px;
-      color: #cbd5e1;
+    }
+
+    .cr-icon {
+      font-size: 16px;
+      line-height: 1.3;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .cr-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .cr-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.2px;
+    }
+
+    .cr-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
     }
 
     /* Bento Feature Grid */
     .features-sec {
-      padding: 70px 0 100px;
+      padding: 50px 0;
     }
 
     .bento-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 18px;
     }
 
     .bento-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 32px;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 14px;
+      padding: 24px;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       backdrop-filter: blur(15px);
       position: relative;
-      overflow: hidden;
     }
 
     .bento-card:hover {
       border-color: var(--border-hover);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    body.light-theme .bento-card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
     }
 
     .bento-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
       background: rgba(99, 102, 241, 0.12);
       border: 1px solid rgba(99, 102, 241, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 22px;
-      margin-bottom: 22px;
+      font-size: 20px;
+      margin-bottom: 16px;
     }
 
     .bento-title {
-      font-size: 19px;
+      font-size: 17px;
       font-weight: 800;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       letter-spacing: -0.3px;
     }
 
     .bento-desc {
       color: var(--text-muted);
-      font-size: 14px;
-      line-height: 1.65;
+      font-size: 13.5px;
+      line-height: 1.55;
     }
 
     /* Interactive Savings Calculator */
     .calc-sec {
-      padding: 60px 0 100px;
+      padding: 50px 0;
     }
 
     .calc-card {
-      max-width: 840px;
+      max-width: 800px;
       margin: 0 auto;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(20px);
     }
 
+    body.light-theme .calc-card {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+    }
+
     .calc-row {
-      margin-bottom: 30px;
+      margin-bottom: 24px;
     }
 
     .calc-label {
       display: flex;
       justify-content: space-between;
       font-weight: 700;
-      margin-bottom: 12px;
-      font-size: 15px;
+      margin-bottom: 10px;
+      font-size: 14.5px;
     }
 
     .calc-slider {
       width: 100%;
-      height: 8px;
+      height: 7px;
       background: #1e293b;
       border-radius: 4px;
       outline: none;
       -webkit-appearance: none;
     }
 
+    body.light-theme .calc-slider {
+      background: #cbd5e1;
+    }
+
     .calc-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 22px;
-      height: 22px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: var(--primary);
       cursor: pointer;
-      box-shadow: 0 0 15px var(--primary);
+      box-shadow: 0 0 12px var(--primary);
     }
 
     .calc-metrics {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 14px;
       background: rgba(7, 9, 14, 0.8);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
+      border-radius: 12px;
+      padding: 20px;
       text-align: center;
     }
 
+    body.light-theme .calc-metrics {
+      background: #f1f5f9;
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+
     .metric-val {
-      font-size: 26px;
+      font-size: 24px;
       font-weight: 800;
       font-family: var(--font-mono);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .metric-lbl {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-dim);
       text-transform: uppercase;
@@ -706,85 +953,94 @@
 
     /* Sideloading Walkthrough */
     .install-sec {
-      padding: 60px 0 100px;
+      padding: 50px 0;
     }
 
     .install-card {
-      max-width: 840px;
+      max-width: 800px;
       margin: 0 auto;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 40px;
+      border-radius: 16px;
+      padding: 30px;
     }
 
     .install-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
     }
 
     .install-step {
       background: rgba(8, 11, 19, 0.7);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 22px;
-      position: relative;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    body.light-theme .install-step {
+      background: rgba(255, 255, 255, 0.8);
+      border-color: rgba(0, 0, 0, 0.08);
     }
 
     .step-badge {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
       background: var(--gradient-brand);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 800;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .install-step h4 {
-      font-size: 15px;
+      font-size: 14.5px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .install-step p {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     .code-pill {
       background: rgba(0, 0, 0, 0.4);
-      padding: 2px 6px;
+      padding: 2px 5px;
       border-radius: 4px;
       font-family: var(--font-mono);
-      font-size: 11.5px;
+      font-size: 11px;
       color: #a5b4fc;
+    }
+
+    body.light-theme .code-pill {
+      background: #e2e8f0;
+      color: #4338ca;
     }
 
     /* FAQ Accordion */
     .faq-sec {
-      padding: 40px 0 100px;
+      padding: 40px 0 50px;
     }
 
     .faq-list {
-      max-width: 780px;
+      max-width: 740px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
     }
 
     .faq-item {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px 24px;
+      border-radius: 10px;
+      padding: 16px 20px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
@@ -793,8 +1049,12 @@
       border-color: rgba(255, 255, 255, 0.18);
     }
 
+    body.light-theme .faq-item:hover {
+      border-color: rgba(0, 0, 0, 0.18);
+    }
+
     .faq-q {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       display: flex;
       justify-content: space-between;
@@ -802,10 +1062,10 @@
     }
 
     .faq-a {
-      margin-top: 12px;
-      font-size: 14px;
+      margin-top: 10px;
+      font-size: 13.5px;
       color: var(--text-muted);
-      line-height: 1.6;
+      line-height: 1.55;
       display: none;
     }
 
@@ -816,15 +1076,21 @@
     /* Footer */
     footer {
       border-top: 1px solid var(--border);
-      padding: 60px 0 40px;
+      padding: 36px 0 24px;
       background: rgba(7, 9, 14, 0.95);
       text-align: center;
+      transition: background 0.25s ease;
+    }
+
+    body.light-theme footer {
+      background: #f8fafc;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
     }
 
     .footer-brand {
-      font-size: 20px;
+      font-size: 19px;
       font-weight: 800;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .footer-brand span {
@@ -835,15 +1101,15 @@
 
     .footer-credit {
       color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 24px;
+      font-size: 13.5px;
+      margin-bottom: 16px;
     }
 
     .footer-links {
       display: flex;
       justify-content: center;
-      gap: 28px;
-      font-size: 14px;
+      gap: 24px;
+      font-size: 13.5px;
       font-weight: 600;
     }
 
@@ -854,19 +1120,35 @@
     }
 
     .footer-links a:hover {
-      color: #fff;
+      color: var(--text-main);
     }
 
     @media (max-width: 900px) {
-      .bento-grid { grid-template-columns: 1fr; }
-      .compare-grid { grid-template-columns: 1fr; }
-      .sim-layout { grid-template-columns: 1fr; }
-      .sim-mid { flex-direction: row; justify-content: center; }
-      .nav-links { display: none; }
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sim-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sim-mid {
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .nav-links {
+        display: none;
+      }
     }
   </style>
 </head>
-<body>
+
+<body class="light-theme">
 
   <!-- Ambient Glow Elements -->
   <div class="ambient-glow">
@@ -881,7 +1163,7 @@
     <div class="container nav-wrap">
       <a href="#" class="logo-wrap">
         <img src="icons/icon48.png" alt="ChatBridge" class="logo-badge" />
-        Chat<span>Bridge</span>
+        ChatBridge</span>
       </a>
       <nav class="nav-links">
         <a href="#features">Features</a>
@@ -892,10 +1174,34 @@
       </nav>
       <div class="nav-actions">
         <a href="https://github.com/Rajivkhurana/Chat-Bridge" target="_blank" class="btn-gh">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          Star on GitHub ⭐
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          Star ⭐
         </a>
-        <a href="#install" class="btn-brand">Get Extension</a>
+        <button onclick="handleGetExtension(event)" class="btn-brand"
+          title="Download ChatBridge Extension & View Setup">Get Extension</button>
+        <!-- Theme Toggle Button -->
+        <button class="theme-toggle-btn" id="themeToggle" onclick="toggleTheme()" title="Toggle Light / Dark Mode"
+          aria-label="Toggle Theme">
+          <svg class="sun-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="moon-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
@@ -903,21 +1209,19 @@
   <main class="container">
     <!-- Hero Section -->
     <section class="hero">
-      <div class="hero-pill">
-        <span class="pill-pulse"></span>
-        v1.3.0 Open-Source Release &bull; Chrome MV3 &bull; 100% Local
-      </div>
 
       <h1 class="hero-h1">
         Move AI conversations across models with <span class="grad">zero context loss</span>.
       </h1>
 
       <p class="hero-p">
-        Stop copy-pasting walls of text and losing your debugging history. ChatBridge extracts active chats from Claude, ChatGPT, Gemini, and Perplexity and auto-pastes a structured Decision Handoff in 1 click.
+        Stop copy-pasting walls of text and losing your debugging history. ChatBridge extracts active chats from Claude,
+        ChatGPT, Gemini, and Perplexity and auto-pastes a structured Decision Handoff in 1 click.
       </p>
 
       <div class="hero-btns">
-        <a href="#install" class="btn-brand">⬇ Sideload in Chrome (1 Min)</a>
+        <button onclick="handleGetExtension(event)" class="btn-brand"
+          title="Download ChatBridge Extension & View Setup">Get Extension (Free)</button>
         <a href="https://github.com/Rajivkhurana/Chat-Bridge" target="_blank" class="btn-gh">⭐ Star on GitHub</a>
       </div>
 
@@ -941,20 +1245,21 @@
             </div>
             <div class="pane-body">👤 <strong>User:</strong> How to reverse singly linked list in C# with O(1) space?
 
-🤖 <strong>Claude:</strong> In C#, we use 3 pointers (prev, current, next):
+              🤖 <strong>Claude:</strong> In C#, we use 3 pointers (prev, current, next):
 
-<span style="color:#a5b4fc">public static Node Reverse(Node head) {
-    Node prev = null; Node current = head;
-    while (current != null) {
-        Node next = current.Next;
-        current.Next = prev;
-        prev = current;
-        current = next;
-    }
-    return prev;
-}</span>
+              <span class="code-hl">public static Node Reverse(Node head) {
+                Node prev = null; Node current = head;
+                while (current != null) {
+                Node next = current.Next;
+                current.Next = prev;
+                prev = current;
+                current = next;
+                }
+                return prev;
+                }</span>
 
-Let's now write unit tests for edge cases like null and single node list.</div>
+              Let's now write unit tests for edge cases like null and single node list.
+            </div>
           </div>
 
           <!-- Bridge Action -->
@@ -963,21 +1268,25 @@ Let's now write unit tests for edge cases like null and single node list.</div>
               ⚡ 1-Click Bridge
             </button>
             <div class="saving-pill" id="simSaving">📉 68% Tokens Saved</div>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </div>
 
           <!-- Destination Pane -->
           <div class="sim-pane">
             <div class="pane-header">
               <span class="model-badge badge-chatgpt">ChatGPT 4o (Auto-Injected)</span>
-              <span class="pane-token-count" style="color:#34d399">comp: 620 tokens</span>
+              <span class="pane-token-count" style="color:#10b981">comp: 620 tokens</span>
             </div>
             <div class="pane-body" id="simDestText"><strong>[AI Context & Decision Handoff]</strong>
-• <strong>Goal:</strong> Reverse singly linked list in C# (O(1) memory).
-• <strong>Decisions & Alternatives:</strong> Recursive method rejected due to stack frames; adopted 3-pointer iterative method.
-• <strong>Working Code:</strong>
-<span style="color:#a5b4fc">public static Node Reverse(Node head) { ... }</span>
-• <strong>Next Move:</strong> Write unit tests covering null head and 1-node lists.</div>
+              • <strong>Goal:</strong> Reverse singly linked list in C# (O(1) memory).
+              • <strong>Decisions & Alternatives:</strong> Recursive method rejected due to stack frames; adopted
+              3-pointer iterative method.
+              • <strong>Working Code:</strong>
+              <span class="code-hl">public static Node Reverse(Node head) { ... }</span>
+              • <strong>Next Move:</strong> Write unit tests covering null head and 1-node lists.
+            </div>
           </div>
         </div>
       </div>
@@ -1008,10 +1317,34 @@ Let's now write unit tests for edge cases like null and single node list.</div>
           <span class="box-tag tag-bad">❌ The Old Way (Manual Copy-Paste)</span>
           <h3 class="box-title">Losing the "Decision Story"</h3>
           <ul class="box-list">
-            <li><span>🚫</span> <strong>Context Amnesia:</strong> New AI repeats discarded architectures and rejected ideas.</li>
-            <li><span>🚫</span> <strong>Token Bloat:</strong> Wastes 70%+ of token context on greetings and conversational filler.</li>
-            <li><span>🚫</span> <strong>Broken Code Syntax:</strong> Copy-pasting long markdown blocks truncates code.</li>
-            <li><span>🚫</span> <strong>Manual Friction:</strong> 6+ clicks to open new tab, paste, and explain where you left off.</li>
+            <li class="compare-row">
+              <div class="cr-icon">🚫</div>
+              <div class="cr-text">
+                <div class="cr-title">Context Amnesia</div>
+                <div class="cr-desc">New AI repeats discarded architectures and rejected ideas.</div>
+              </div>
+            </li>
+            <li class="compare-row">
+              <div class="cr-icon">🚫</div>
+              <div class="cr-text">
+                <div class="cr-title">Token Bloat</div>
+                <div class="cr-desc">Wastes 70%+ of token context on greetings and conversational filler.</div>
+              </div>
+            </li>
+            <li class="compare-row">
+              <div class="cr-icon">🚫</div>
+              <div class="cr-text">
+                <div class="cr-title">Broken Code Syntax</div>
+                <div class="cr-desc">Copy-pasting long markdown blocks truncates code.</div>
+              </div>
+            </li>
+            <li class="compare-row">
+              <div class="cr-icon">🚫</div>
+              <div class="cr-text">
+                <div class="cr-title">Manual Friction</div>
+                <div class="cr-desc">6+ clicks to open new tab, paste, and explain where you left off.</div>
+              </div>
+            </li>
           </ul>
         </div>
 
@@ -1019,10 +1352,34 @@ Let's now write unit tests for edge cases like null and single node list.</div>
           <span class="box-tag tag-good">✅ The ChatBridge Way</span>
           <h3 class="box-title">Automated 1-Click Decision Handoff</h3>
           <ul class="box-list">
-            <li><span>⚡</span> <strong>Full Decision Matrix:</strong> Captures what was built, rejected options & why, and exact next moves.</li>
-            <li><span>📉</span> <strong>-65% Token Reduction:</strong> Strips filler while preserving 100% of algorithmic code syntax.</li>
-            <li><span>🚀</span> <strong>1-Click Synthetic Injection:</strong> Automatically opens the target tab and pastes into the prompt box.</li>
-            <li><span>🔒</span> <strong>100% Private & Local:</strong> No tracking, zero servers, API keys stay in local browser storage.</li>
+            <li class="compare-row">
+              <div class="cr-icon">⚡</div>
+              <div class="cr-text">
+                <div class="cr-title">Full Decision Matrix</div>
+                <div class="cr-desc">Captures what was built, rejected options & why, and exact next moves.</div>
+              </div>
+            </li>
+            <li class="compare-row">
+              <div class="cr-icon">📉</div>
+              <div class="cr-text">
+                <div class="cr-title">-65% Token Reduction</div>
+                <div class="cr-desc">Strips filler while preserving 100% of algorithmic code syntax.</div>
+              </div>
+            </li>
+            <li class="compare-row">
+              <div class="cr-icon">🚀</div>
+              <div class="cr-text">
+                <div class="cr-title">1-Click Synthetic Injection</div>
+                <div class="cr-desc">Automatically opens the target tab and pastes into the prompt box.</div>
+              </div>
+            </li>
+            <li class="compare-row">
+              <div class="cr-icon">🔒</div>
+              <div class="cr-text">
+                <div class="cr-title">100% Private & Local</div>
+                <div class="cr-desc">No tracking, zero servers, API keys stay in local browser storage.</div>
+              </div>
+            </li>
           </ul>
         </div>
       </div>
@@ -1039,37 +1396,43 @@ Let's now write unit tests for edge cases like null and single node list.</div>
         <div class="bento-card">
           <div class="bento-icon">🧠</div>
           <h3 class="bento-title">Decision Handoff Engine</h3>
-          <p class="bento-desc">Extracts the core problem, rejected options & why, and the exact next moves so the destination model never repeats discarded mistakes.</p>
+          <p class="bento-desc">Extracts the core problem, rejected options & why, and the exact next moves so the
+            destination model never repeats discarded mistakes.</p>
         </div>
 
         <div class="bento-card">
           <div class="bento-icon">🛡️</div>
           <h3 class="bento-title">Code Block Preservation</h3>
-          <p class="bento-desc">Isolates all code blocks before reduction. Functions, classes, and algorithms remain 100% intact with zero syntax cuts.</p>
+          <p class="bento-desc">Isolates all code blocks before reduction. Functions, classes, and algorithms remain
+            100% intact with zero syntax cuts.</p>
         </div>
 
         <div class="bento-card">
           <div class="bento-icon">🚀</div>
           <h3 class="bento-title">1-Click Auto-Paste</h3>
-          <p class="bento-desc">Programmatically opens destination tabs and dispatches synthetic input events to inject context straight into the prompt box.</p>
+          <p class="bento-desc">Programmatically opens destination tabs and dispatches synthetic input events to inject
+            context straight into the prompt box.</p>
         </div>
 
         <div class="bento-card">
           <div class="bento-icon">🔒</div>
           <h3 class="bento-title">100% Client-Side Privacy</h3>
-          <p class="bento-desc">No accounts, no analytics, no backend servers. All API keys and conversation tokens live only in your browser's local storage.</p>
+          <p class="bento-desc">No accounts, no analytics, no backend servers. All API keys and conversation tokens live
+            only in your browser's local storage.</p>
         </div>
 
         <div class="bento-card">
           <div class="bento-icon">⚡</div>
           <h3 class="bento-title">BYOK Sub-Second AI</h3>
-          <p class="bento-desc">Bring your own key from Groq, OpenRouter, NVIDIA NIM, Together AI, Mistral, or OpenAI for instant structured briefs.</p>
+          <p class="bento-desc">Bring your own key from Groq, OpenRouter, NVIDIA NIM, Together AI, Mistral, or OpenAI
+            for instant structured briefs.</p>
         </div>
 
         <div class="bento-card">
           <div class="bento-icon">🌐</div>
           <h3 class="bento-title">Cross-Model Ecosystem</h3>
-          <p class="bento-desc">Works natively across Claude 3.5 Sonnet, ChatGPT 4o, Google Gemini, and Perplexity AI with resilient DOM fallback selectors.</p>
+          <p class="bento-desc">Works natively across Claude 3.5 Sonnet, ChatGPT 4o, Google Gemini, and Perplexity AI
+            with resilient DOM fallback selectors.</p>
         </div>
       </div>
     </section>
@@ -1085,18 +1448,20 @@ Let's now write unit tests for edge cases like null and single node list.</div>
         <div class="calc-row">
           <div class="calc-label">
             <span>Average Conversation Size</span>
-            <span id="calcMsgCount" style="color: #a5b4fc; font-family: var(--font-mono)">25 Messages (~4,000 tokens)</span>
+            <span id="calcMsgCount" style="color: #a5b4fc; font-family: var(--font-mono)">25 Messages (~4,000
+              tokens)</span>
           </div>
-          <input type="range" min="5" max="100" value="25" class="calc-slider" id="calcSlider" oninput="updateCalculator(this.value)" />
+          <input type="range" min="5" max="100" value="25" class="calc-slider" id="calcSlider"
+            oninput="updateCalculator(this.value)" />
         </div>
 
         <div class="calc-metrics">
           <div>
-            <div class="metric-val" id="valSavedTokens" style="color: #34d399">2,600</div>
+            <div class="metric-val" id="valSavedTokens" style="color: #10b981">2,600</div>
             <div class="metric-lbl">Tokens Saved / Chat</div>
           </div>
           <div>
-            <div class="metric-val" id="valReduction" style="color: #60a5fa">65%</div>
+            <div class="metric-val" id="valReduction" style="color: #6366f1">65%</div>
             <div class="metric-lbl">Context Compression</div>
           </div>
           <div>
@@ -1118,14 +1483,18 @@ Let's now write unit tests for edge cases like null and single node list.</div>
         <div class="install-grid">
           <div class="install-step">
             <div class="step-badge">1</div>
-            <h4>Clone / Download</h4>
-            <p>Clone the GitHub repository or download the ZIP and extract it to a permanent folder on your machine.</p>
+            <h4>Download Extension</h4>
+            <p>Download the ZIP archive and extract it to a permanent folder on your computer.</p>
+            <a href="https://github.com/Rajivkhurana/Chat-Bridge/archive/refs/heads/master.zip" class="code-pill"
+              style="display:inline-block; margin-top:6px; font-weight:700; text-decoration:none;" download>📦 Download
+              master.zip</a>
           </div>
 
           <div class="install-step">
             <div class="step-badge">2</div>
             <h4>Open Extensions</h4>
-            <p>Navigate to <span class="code-pill">chrome://extensions</span> (or <span class="code-pill">edge://extensions</span>) in your browser.</p>
+            <p>Navigate to <span class="code-pill">chrome://extensions</span> (or <span
+                class="code-pill">edge://extensions</span>) in your browser.</p>
           </div>
 
           <div class="install-step">
@@ -1137,7 +1506,8 @@ Let's now write unit tests for edge cases like null and single node list.</div>
           <div class="install-step">
             <div class="step-badge">4</div>
             <h4>Load Unpacked</h4>
-            <p>Click <strong>Load unpacked</strong> and select the <span class="code-pill">chat-bridge-extension</span> folder containing <span class="code-pill">manifest.json</span>.</p>
+            <p>Click <strong>Load unpacked</strong> and select the <span class="code-pill">chat-bridge-extension</span>
+              folder containing <span class="code-pill">manifest.json</span>.</p>
           </div>
         </div>
       </div>
@@ -1153,22 +1523,26 @@ Let's now write unit tests for edge cases like null and single node list.</div>
       <div class="faq-list">
         <div class="faq-item" onclick="toggleFaq(this)">
           <div class="faq-q">Is ChatBridge 100% free and open-source? <span>+</span></div>
-          <div class="faq-a">Yes! ChatBridge is completely open-source under the MIT License. You can inspect the source code, contribute, or build custom extractors directly on GitHub.</div>
+          <div class="faq-a">Yes! ChatBridge is completely open-source under the MIT License. You can inspect the source
+            code, contribute, or build custom extractors directly on GitHub.</div>
         </div>
 
         <div class="faq-item" onclick="toggleFaq(this)">
           <div class="faq-q">Where are my API keys and conversations stored? <span>+</span></div>
-          <div class="faq-a">Everything is stored exclusively in your browser's local <code>chrome.storage.local</code>. ChatBridge has zero remote servers, zero analytics, and zero external telemetry.</div>
+          <div class="faq-a">Everything is stored exclusively in your browser's local <code>chrome.storage.local</code>.
+            ChatBridge has zero remote servers, zero analytics, and zero external telemetry.</div>
         </div>
 
         <div class="faq-item" onclick="toggleFaq(this)">
           <div class="faq-q">Can I use ChatBridge without entering any API keys? <span>+</span></div>
-          <div class="faq-a">Yes! ChatBridge features powerful built-in local heuristic modes (Smart Mode, Aggressive Mode, Full Chat, User Only) that operate instantly without any AI API keys or network requests.</div>
+          <div class="faq-a">Yes! ChatBridge features powerful built-in local heuristic modes (Smart Mode, Aggressive
+            Mode, Full Chat, User Only) that operate instantly without any AI API keys or network requests.</div>
         </div>
 
         <div class="faq-item" onclick="toggleFaq(this)">
           <div class="faq-q">Which browsers are supported? <span>+</span></div>
-          <div class="faq-a">ChatBridge is built on Manifest V3 and runs on Google Chrome, Brave, Microsoft Edge, Opera, Arc, and any Chromium-based browser.</div>
+          <div class="faq-a">ChatBridge is built on Manifest V3 and runs on Google Chrome, Brave, Microsoft Edge, Opera,
+            Arc, and any Chromium-based browser.</div>
         </div>
       </div>
     </section>
@@ -1188,6 +1562,23 @@ Let's now write unit tests for edge cases like null and single node list.</div>
   </footer>
 
   <script>
+    // Theme Switcher Logic
+    function toggleTheme() {
+      document.body.classList.toggle('light-theme');
+      const isLight = document.body.classList.contains('light-theme');
+      localStorage.setItem('chatbridge-theme', isLight ? 'light' : 'dark');
+    }
+
+    // Initialize Saved Theme (Default: Light Mode)
+    (function () {
+      const savedTheme = localStorage.getItem('chatbridge-theme');
+      if (savedTheme === 'dark') {
+        document.body.classList.remove('light-theme');
+      } else {
+        document.body.classList.add('light-theme');
+      }
+    })();
+
     // Interactive Calculator
     function updateCalculator(val) {
       const msgs = parseInt(val);
@@ -1204,15 +1595,21 @@ Let's now write unit tests for edge cases like null and single node list.</div>
       if (icon) icon.textContent = el.classList.contains('open') ? '−' : '+';
     }
 
-    // Live Simulator Animation
-    function runSimAnimation() {
-      const badge = document.getElementById('simSaving');
-      badge.style.transform = 'scale(1.2)';
-      badge.style.transition = 'transform 0.2s ease';
-      setTimeout(() => {
-        badge.style.transform = 'scale(1)';
-      }, 250);
+    // Dual-Action: Scroll to Installation Guide + Download ZIP
+    function handleGetExtension(e) {
+      if (e) e.preventDefault();
+      const installEl = document.getElementById('install');
+      if (installEl) {
+        installEl.scrollIntoView({ behavior: 'smooth' });
+      }
+      const dlLink = document.createElement('a');
+      dlLink.href = 'https://github.com/Rajivkhurana/Chat-Bridge/archive/refs/heads/master.zip';
+      dlLink.download = 'Chat-Bridge-master.zip';
+      document.body.appendChild(dlLink);
+      dlLink.click();
+      document.body.removeChild(dlLink);
     }
   </script>
 </body>
+
 </html>
