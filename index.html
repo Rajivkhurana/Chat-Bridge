@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatBridge — 1-Click Cross-AI Context & Decision Handoff</title>
+  <meta name="description" content="Open-source browser extension to move AI conversations across Claude, ChatGPT, Gemini, and Perplexity with zero context loss and zero token waste." />
+  
+  <!-- Open Graph Meta -->
+  <meta property="og:title" content="ChatBridge — 1-Click Cross-AI Context & Decision Handoff" />
+  <meta property="og:description" content="Move AI conversations across models with zero context loss and -65% token waste. 100% private, client-side, and open source." />
+  <meta property="og:image" content="store-assets/screenshot-1-extract.png" />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" type="image/png" href="icons/icon48.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg: #07090e;
+      --bg-surface: #0d121d;
+      --bg-card: rgba(15, 22, 36, 0.65);
+      --bg-glass: rgba(20, 29, 48, 0.45);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(99, 102, 241, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #6366f1;
+      --primary-glow: rgba(99, 102, 241, 0.4);
+      --accent-purple: #a855f7;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --gradient-brand: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+      --gradient-cyan: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      --gradient-dark: linear-gradient(180deg, rgba(13, 18, 29, 0.8) 0%, rgba(7, 9, 14, 0.95) 100%);
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Glowing Mesh Background */
+    .ambient-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .glow-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(130px);
+      opacity: 0.22;
+      animation: floatOrb 20s infinite alternate ease-in-out;
+    }
+
+    .glow-1 {
+      width: 600px;
+      height: 600px;
+      background: #6366f1;
+      top: -100px;
+      left: 15%;
+    }
+
+    .glow-2 {
+      width: 500px;
+      height: 500px;
+      background: #a855f7;
+      top: 30%;
+      right: 5%;
+      animation-delay: -5s;
+    }
+
+    .glow-3 {
+      width: 550px;
+      height: 550px;
+      background: #06b6d4;
+      bottom: 5%;
+      left: 20%;
+      animation-delay: -10s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(60px, 40px) scale(1.1); }
+      100% { transform: translate(-40px, 70px) scale(0.95); }
+    }
+
+    /* Grid Overlay */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Header Nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(7, 9, 14, 0.75);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 74px;
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 21px;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .logo-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .logo-wrap:hover .logo-badge {
+      transform: scale(1.08) rotate(3deg);
+    }
+
+    .logo-wrap span {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .nav-links a {
+      transition: color 0.2s ease;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-gh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-gh:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 24px;
+      background: var(--gradient-brand);
+      border: none;
+      border-radius: 9px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+      transition: all 0.25s ease;
+    }
+
+    .btn-brand:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(99, 102, 241, 0.55);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 90px 0 70px;
+      text-align: center;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #a5b4fc;
+      margin-bottom: 28px;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+    }
+
+    .pill-pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 10px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .hero-h1 {
+      font-size: clamp(38px, 6vw, 68px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -2px;
+      max-width: 950px;
+      margin: 0 auto 24px;
+    }
+
+    .hero-h1 .grad {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-p {
+      font-size: clamp(16px, 2.2vw, 20px);
+      color: var(--text-muted);
+      max-width: 720px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+    }
+
+    .hero-btns {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 60px;
+      flex-wrap: wrap;
+    }
+
+    /* Live Interactive Extension Simulator */
+    .sim-card {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(99, 102, 241, 0.15);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+    }
+
+    .sim-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .sim-dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .s-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .s-red { background: #ef4444; }
+    .s-yel { background: #f59e0b; }
+    .s-grn { background: #10b981; }
+
+    .sim-tagline {
+      font-size: 13px;
+      font-weight: 700;
+      color: #a5b4fc;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      padding: 4px 14px;
+      border-radius: 999px;
+    }
+
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 24px;
+      align-items: stretch;
+      text-align: left;
+    }
+
+    .sim-pane {
+      background: rgba(8, 11, 19, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      height: 310px;
+    }
+
+    .pane-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .model-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-claude { background: rgba(217, 119, 6, 0.18); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.3); }
+    .badge-chatgpt { background: rgba(16, 163, 127, 0.18); color: #34d399; border: 1px solid rgba(16, 163, 127, 0.3); }
+
+    .pane-token-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .pane-body {
+      flex: 1;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .sim-mid {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 0 10px;
+    }
+
+    .bridge-btn-pulse {
+      background: var(--gradient-brand);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 800;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: transform 0.2s ease;
+    }
+
+    .bridge-btn-pulse:hover {
+      transform: scale(1.05);
+    }
+
+    .saving-pill {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    /* Ecosystem Marquee */
+    .ecosystem-sec {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: rgba(13, 18, 29, 0.4);
+      text-align: center;
+    }
+
+    .eco-title {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .eco-grid {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 36px;
+      flex-wrap: wrap;
+    }
+
+    .eco-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #94a3b8;
+      transition: all 0.2s ease;
+    }
+
+    .eco-item:hover {
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Comparison Section (Old Way vs ChatBridge) */
+    .compare-sec {
+      padding: 100px 0 70px;
+    }
+
+    .sec-header {
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto 55px;
+    }
+
+    .sec-h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+
+    .sec-p {
+      color: var(--text-muted);
+      font-size: 17px;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .compare-box {
+      border-radius: 18px;
+      padding: 36px;
+      backdrop-filter: blur(15px);
+    }
+
+    .box-bad {
+      background: rgba(239, 68, 68, 0.03);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+    }
+
+    .box-good {
+      background: rgba(16, 185, 129, 0.04);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      box-shadow: 0 0 40px rgba(16, 185, 129, 0.08);
+    }
+
+    .box-tag {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+    .tag-bad { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+    .tag-good { background: rgba(16, 185, 129, 0.18); color: #34d399; }
+
+    .box-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      letter-spacing: -0.4px;
+    }
+
+    .box-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .box-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14.5px;
+      color: #cbd5e1;
+    }
+
+    /* Bento Feature Grid */
+    .features-sec {
+      padding: 70px 0 100px;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .bento-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(15px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bento-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.12);
+    }
+
+    .bento-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 22px;
+    }
+
+    .bento-title {
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .bento-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* Interactive Savings Calculator */
+    .calc-sec {
+      padding: 60px 0 100px;
+    }
+
+    .calc-card {
+      max-width: 840px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      backdrop-filter: blur(20px);
+    }
+
+    .calc-row {
+      margin-bottom: 30px;
+    }
+
+    .calc-label {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .calc-slider {
+      width: 100%;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .calc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--primary);
+    }
+
+    .calc-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      background: rgba(7, 9, 14, 0.8);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-size: 26px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      margin-bottom: 4px;
+    }
+
+    .metric-lbl {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Sideloading Walkthrough */
+    .install-sec {
+      padding: 60px 0 100px;
+    }
+
+    .install-card {
+      max-width: 840px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+    }
+
+    .install-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .install-step {
+      background: rgba(8, 11, 19, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      position: relative;
+    }
+
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--gradient-brand);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .install-step h4 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .install-step p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .code-pill {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: #a5b4fc;
+    }
+
+    /* FAQ Accordion */
+    .faq-sec {
+      padding: 40px 0 100px;
+    }
+
+    .faq-list {
+      max-width: 780px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .faq-item:hover {
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .faq-q {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .faq-a {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      display: none;
+    }
+
+    .faq-item.open .faq-a {
+      display: block;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 60px 0 40px;
+      background: rgba(7, 9, 14, 0.95);
+      text-align: center;
+    }
+
+    .footer-brand {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .footer-brand span {
+      background: var(--gradient-brand);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .footer-credit {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .footer-links a:hover {
+      color: #fff;
+    }
+
+    @media (max-width: 900px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .sim-layout { grid-template-columns: 1fr; }
+      .sim-mid { flex-direction: row; justify-content: center; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Elements -->
+  <div class="ambient-glow">
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+    <div class="glow-orb glow-3"></div>
+  </div>
+  <div class="grid-bg"></div>
+
+  <!-- Header Nav -->
+  <header>
+    <div class="container nav-wrap">
+      <a href="#" class="logo-wrap">
+        <img src="icons/icon48.png" alt="ChatBridge" class="logo-badge" />
+        Chat<span>Bridge</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#compare">Why ChatBridge</a>
+        <a href="#calculator">Token Calculator</a>
+        <a href="#install">Install Guide</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-actions">
+        <a href="https://github.com/Rajivkhurana/Chat-Bridge" target="_blank" class="btn-gh">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          Star on GitHub ⭐
+        </a>
+        <a href="#install" class="btn-brand">Get Extension</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-pill">
+        <span class="pill-pulse"></span>
+        v1.3.0 Open-Source Release &bull; Chrome MV3 &bull; 100% Local
+      </div>
+
+      <h1 class="hero-h1">
+        Move AI conversations across models with <span class="grad">zero context loss</span>.
+      </h1>
+
+      <p class="hero-p">
+        Stop copy-pasting walls of text and losing your debugging history. ChatBridge extracts active chats from Claude, ChatGPT, Gemini, and Perplexity and auto-pastes a structured Decision Handoff in 1 click.
+      </p>
+
+      <div class="hero-btns">
+        <a href="#install" class="btn-brand">⬇ Sideload in Chrome (1 Min)</a>
+        <a href="https://github.com/Rajivkhurana/Chat-Bridge" target="_blank" class="btn-gh">⭐ Star on GitHub</a>
+      </div>
+
+      <!-- Live Interactive Simulator -->
+      <div class="sim-card">
+        <div class="sim-bar">
+          <div class="sim-dots">
+            <div class="s-dot s-red"></div>
+            <div class="s-dot s-yel"></div>
+            <div class="s-dot s-grn"></div>
+          </div>
+          <div class="sim-tagline">⚡ Live Cross-Model Simulation: Claude ➔ ChatGPT</div>
+        </div>
+
+        <div class="sim-layout">
+          <!-- Source Pane -->
+          <div class="sim-pane">
+            <div class="pane-header">
+              <span class="model-badge badge-claude">Claude 3.5 Sonnet (Source)</span>
+              <span class="pane-token-count">orig: 1,940 tokens</span>
+            </div>
+            <div class="pane-body">👤 <strong>User:</strong> How to reverse singly linked list in C# with O(1) space?
+
+🤖 <strong>Claude:</strong> In C#, we use 3 pointers (prev, current, next):
+
+<span style="color:#a5b4fc">public static Node Reverse(Node head) {
+    Node prev = null; Node current = head;
+    while (current != null) {
+        Node next = current.Next;
+        current.Next = prev;
+        prev = current;
+        current = next;
+    }
+    return prev;
+}</span>
+
+Let's now write unit tests for edge cases like null and single node list.</div>
+          </div>
+
+          <!-- Bridge Action -->
+          <div class="sim-mid">
+            <button class="bridge-btn-pulse" onclick="runSimAnimation()">
+              ⚡ 1-Click Bridge
+            </button>
+            <div class="saving-pill" id="simSaving">📉 68% Tokens Saved</div>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+
+          <!-- Destination Pane -->
+          <div class="sim-pane">
+            <div class="pane-header">
+              <span class="model-badge badge-chatgpt">ChatGPT 4o (Auto-Injected)</span>
+              <span class="pane-token-count" style="color:#34d399">comp: 620 tokens</span>
+            </div>
+            <div class="pane-body" id="simDestText"><strong>[AI Context & Decision Handoff]</strong>
+• <strong>Goal:</strong> Reverse singly linked list in C# (O(1) memory).
+• <strong>Decisions & Alternatives:</strong> Recursive method rejected due to stack frames; adopted 3-pointer iterative method.
+• <strong>Working Code:</strong>
+<span style="color:#a5b4fc">public static Node Reverse(Node head) { ... }</span>
+• <strong>Next Move:</strong> Write unit tests covering null head and 1-node lists.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ecosystem Bar -->
+    <div class="ecosystem-sec">
+      <div class="eco-title">Zero-Loss Interoperability Across Top AI Platforms & Providers</div>
+      <div class="eco-grid">
+        <div class="eco-item"><span style="color:#d97706">●</span> Claude</div>
+        <div class="eco-item"><span style="color:#10a37f">●</span> ChatGPT</div>
+        <div class="eco-item"><span style="color:#2563eb">●</span> Google Gemini</div>
+        <div class="eco-item"><span style="color:#0891b2">●</span> Perplexity AI</div>
+        <div class="eco-item"><span style="color:#f97316">●</span> Groq (Llama 3.3)</div>
+        <div class="eco-item"><span style="color:#8b5cf6">●</span> OpenRouter</div>
+      </div>
+    </div>
+
+    <!-- Comparison Section -->
+    <section class="compare-sec" id="compare">
+      <div class="sec-header">
+        <h2 class="sec-h2">Why Traditional Copy-Pasting Fails</h2>
+        <p class="sec-p">Manual copying wastes time, blows past token limits, and causes AI "Context Amnesia".</p>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-box box-bad">
+          <span class="box-tag tag-bad">❌ The Old Way (Manual Copy-Paste)</span>
+          <h3 class="box-title">Losing the "Decision Story"</h3>
+          <ul class="box-list">
+            <li><span>🚫</span> <strong>Context Amnesia:</strong> New AI repeats discarded architectures and rejected ideas.</li>
+            <li><span>🚫</span> <strong>Token Bloat:</strong> Wastes 70%+ of token context on greetings and conversational filler.</li>
+            <li><span>🚫</span> <strong>Broken Code Syntax:</strong> Copy-pasting long markdown blocks truncates code.</li>
+            <li><span>🚫</span> <strong>Manual Friction:</strong> 6+ clicks to open new tab, paste, and explain where you left off.</li>
+          </ul>
+        </div>
+
+        <div class="compare-box box-good">
+          <span class="box-tag tag-good">✅ The ChatBridge Way</span>
+          <h3 class="box-title">Automated 1-Click Decision Handoff</h3>
+          <ul class="box-list">
+            <li><span>⚡</span> <strong>Full Decision Matrix:</strong> Captures what was built, rejected options & why, and exact next moves.</li>
+            <li><span>📉</span> <strong>-65% Token Reduction:</strong> Strips filler while preserving 100% of algorithmic code syntax.</li>
+            <li><span>🚀</span> <strong>1-Click Synthetic Injection:</strong> Automatically opens the target tab and pastes into the prompt box.</li>
+            <li><span>🔒</span> <strong>100% Private & Local:</strong> No tracking, zero servers, API keys stay in local browser storage.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento Features Grid -->
+    <section class="features-sec" id="features">
+      <div class="sec-header">
+        <h2 class="sec-h2">Engineered for High-Agency Developers</h2>
+        <p class="sec-p">A lightweight, lightning-fast extension built with Vanilla JS and Manifest V3.</p>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-card">
+          <div class="bento-icon">🧠</div>
+          <h3 class="bento-title">Decision Handoff Engine</h3>
+          <p class="bento-desc">Extracts the core problem, rejected options & why, and the exact next moves so the destination model never repeats discarded mistakes.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">🛡️</div>
+          <h3 class="bento-title">Code Block Preservation</h3>
+          <p class="bento-desc">Isolates all code blocks before reduction. Functions, classes, and algorithms remain 100% intact with zero syntax cuts.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">🚀</div>
+          <h3 class="bento-title">1-Click Auto-Paste</h3>
+          <p class="bento-desc">Programmatically opens destination tabs and dispatches synthetic input events to inject context straight into the prompt box.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">🔒</div>
+          <h3 class="bento-title">100% Client-Side Privacy</h3>
+          <p class="bento-desc">No accounts, no analytics, no backend servers. All API keys and conversation tokens live only in your browser's local storage.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">⚡</div>
+          <h3 class="bento-title">BYOK Sub-Second AI</h3>
+          <p class="bento-desc">Bring your own key from Groq, OpenRouter, NVIDIA NIM, Together AI, Mistral, or OpenAI for instant structured briefs.</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon">🌐</div>
+          <h3 class="bento-title">Cross-Model Ecosystem</h3>
+          <p class="bento-desc">Works natively across Claude 3.5 Sonnet, ChatGPT 4o, Google Gemini, and Perplexity AI with resilient DOM fallback selectors.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Savings Calculator -->
+    <section class="calc-sec" id="calculator">
+      <div class="sec-header">
+        <h2 class="sec-h2">Calculate Your Token & Cost Savings</h2>
+        <p class="sec-p">See how much context capacity you reclaim across your AI conversations.</p>
+      </div>
+
+      <div class="calc-card">
+        <div class="calc-row">
+          <div class="calc-label">
+            <span>Average Conversation Size</span>
+            <span id="calcMsgCount" style="color: #a5b4fc; font-family: var(--font-mono)">25 Messages (~4,000 tokens)</span>
+          </div>
+          <input type="range" min="5" max="100" value="25" class="calc-slider" id="calcSlider" oninput="updateCalculator(this.value)" />
+        </div>
+
+        <div class="calc-metrics">
+          <div>
+            <div class="metric-val" id="valSavedTokens" style="color: #34d399">2,600</div>
+            <div class="metric-lbl">Tokens Saved / Chat</div>
+          </div>
+          <div>
+            <div class="metric-val" id="valReduction" style="color: #60a5fa">65%</div>
+            <div class="metric-lbl">Context Compression</div>
+          </div>
+          <div>
+            <div class="metric-val" id="valSpeed" style="color: #a855f7">0.4s</div>
+            <div class="metric-lbl">Sub-Second Handoff</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sideloading Walkthrough -->
+    <section class="install-sec" id="install">
+      <div class="sec-header">
+        <h2 class="sec-h2">How to Install in 60 Seconds</h2>
+        <p class="sec-p">Zero complex build steps. Direct unpacked sideloading for Chrome, Brave, and Edge.</p>
+      </div>
+
+      <div class="install-card">
+        <div class="install-grid">
+          <div class="install-step">
+            <div class="step-badge">1</div>
+            <h4>Clone / Download</h4>
+            <p>Clone the GitHub repository or download the ZIP and extract it to a permanent folder on your machine.</p>
+          </div>
+
+          <div class="install-step">
+            <div class="step-badge">2</div>
+            <h4>Open Extensions</h4>
+            <p>Navigate to <span class="code-pill">chrome://extensions</span> (or <span class="code-pill">edge://extensions</span>) in your browser.</p>
+          </div>
+
+          <div class="install-step">
+            <div class="step-badge">3</div>
+            <h4>Enable Developer Mode</h4>
+            <p>Toggle the <strong>Developer mode</strong> switch in the top-right corner to <strong>ON</strong>.</p>
+          </div>
+
+          <div class="install-step">
+            <div class="step-badge">4</div>
+            <h4>Load Unpacked</h4>
+            <p>Click <strong>Load unpacked</strong> and select the <span class="code-pill">chat-bridge-extension</span> folder containing <span class="code-pill">manifest.json</span>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Accordion -->
+    <section class="faq-sec" id="faq">
+      <div class="sec-header">
+        <h2 class="sec-h2">Frequently Asked Questions</h2>
+        <p class="sec-p">Everything you need to know about ChatBridge architecture and privacy.</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Is ChatBridge 100% free and open-source? <span>+</span></div>
+          <div class="faq-a">Yes! ChatBridge is completely open-source under the MIT License. You can inspect the source code, contribute, or build custom extractors directly on GitHub.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Where are my API keys and conversations stored? <span>+</span></div>
+          <div class="faq-a">Everything is stored exclusively in your browser's local <code>chrome.storage.local</code>. ChatBridge has zero remote servers, zero analytics, and zero external telemetry.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Can I use ChatBridge without entering any API keys? <span>+</span></div>
+          <div class="faq-a">Yes! ChatBridge features powerful built-in local heuristic modes (Smart Mode, Aggressive Mode, Full Chat, User Only) that operate instantly without any AI API keys or network requests.</div>
+        </div>
+
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q">Which browsers are supported? <span>+</span></div>
+          <div class="faq-a">ChatBridge is built on Manifest V3 and runs on Google Chrome, Brave, Microsoft Edge, Opera, Arc, and any Chromium-based browser.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-brand">Chat<span>Bridge</span></div>
+      <p class="footer-credit">Built with 💜 by <strong>Rajiv Khurana</strong> &bull; Released under the MIT License</p>
+      <div class="footer-links">
+        <a href="https://github.com/Rajivkhurana/Chat-Bridge" target="_blank">GitHub Repository</a>
+        <a href="https://github.com/Rajivkhurana" target="_blank">GitHub Profile</a>
+        <a href="https://github.com/Rajivkhurana/Chat-Bridge/issues" target="_blank">Issues & Feedback</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Interactive Calculator
+    function updateCalculator(val) {
+      const msgs = parseInt(val);
+      const origTokens = msgs * 160;
+      const savedTokens = Math.round(origTokens * 0.65);
+      document.getElementById('calcMsgCount').textContent = `${msgs} Messages (~${origTokens.toLocaleString()} tokens)`;
+      document.getElementById('valSavedTokens').textContent = savedTokens.toLocaleString();
+    }
+
+    // FAQ Accordion Toggle
+    function toggleFaq(el) {
+      el.classList.toggle('open');
+      const icon = el.querySelector('.faq-q span');
+      if (icon) icon.textContent = el.classList.contains('open') ? '−' : '+';
+    }
+
+    // Live Simulator Animation
+    function runSimAnimation() {
+      const badge = document.getElementById('simSaving');
+      badge.style.transform = 'scale(1.2)';
+      badge.style.transition = 'transform 0.2s ease';
+      setTimeout(() => {
+        badge.style.transform = 'scale(1)';
+      }, 250);
+    }
+  </script>
+</body>
+</html>
