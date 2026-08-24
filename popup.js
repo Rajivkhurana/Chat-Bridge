@@ -63,7 +63,6 @@ const $orKey = document.getElementById("orKey");
 const $orKeyLabel = document.getElementById("orKeyLabel");
 const $orKeyHint = document.getElementById("orKeyHint");
 const $orModel = document.getElementById("orModel");
-const $modelOpts = document.getElementById("modelOptions");
 const $orPrompt = document.getElementById("orPrompt");
 
 let currentTab = null;
@@ -148,7 +147,6 @@ function renderProviderUI(providerId) {
   $orKeyHint.innerHTML = `Get a key at <a href="${p.helpUrl}" target="_blank">${new URL(p.helpUrl).hostname}</a> — stored locally, sent only to ${p.label}.`;
   $orModel.placeholder = `e.g. ${p.models[0]}`;
   $orModel.value = saved.model || "";
-  $modelOpts.innerHTML = p.models.map(m => `<option value="${m}"></option>`).join("");
 }
 
 $orProvider.addEventListener("change", () => renderProviderUI($orProvider.value));
@@ -211,9 +209,13 @@ document.querySelectorAll(".tbtn").forEach(el => {
     el.classList.add("sel");
     el.setAttribute("aria-pressed", "true");
     state.target = el.dataset.target;
-    $btnSend.innerHTML = state.target === "clipboard"
-      ? '<span class="stepno">3</span>Copy 📋'
-      : `<span class="stepno">3</span>Send →`;
+    if (state.target === "clipboard") {
+      $btnSend.innerHTML = '<span class="stepno">3</span>Copy 📋';
+    } else if (state.target === "markdown") {
+      $btnSend.innerHTML = '<span class="stepno">3</span>Export .md 📥';
+    } else {
+      $btnSend.innerHTML = `<span class="stepno">3</span>Send →`;
+    }
   });
 });
 
@@ -667,6 +669,12 @@ const SW_QUOTES = {
     "Your focus determines your reality. Copied! ⚔️",
     "Power! Unlimited power! ⚡"
   ],
+  export: [
+    "Holocron recorded! Markdown downloaded 📜✨",
+    "Data tapes retrieved! Ready for Claude Code 💾",
+    "The Sacred Texts have been preserved! 📚",
+    "Context secured into the archive. May the Force be with your IDE! 🌌"
+  ],
   easterEgg: [
     "⚔️ Kyber Crystal Activated! May the Force be with your tokens!",
     "⚔️ I am one with the Force, and the Force is with me!",
@@ -680,10 +688,136 @@ function getSWQuote(category) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
+// ── Structured Markdown Export (for Claude Code, Cursor, Windsurf, IDEs) ───────
+function buildStructuredMarkdown() {
+  const page = state.pageContext || {};
+  const host = currentTab?.url ? new URL(currentTab.url).hostname : "";
+  let sourcePlatform = "AI Chat";
+  if (host.includes("claude.ai")) sourcePlatform = "Claude AI";
+  else if (host.includes("chatgpt.com") || host.includes("openai.com")) sourcePlatform = "ChatGPT (OpenAI)";
+  else if (host.includes("gemini.google.com")) sourcePlatform = "Google Gemini";
+  else if (host.includes("perplexity.ai")) sourcePlatform = "Perplexity AI";
+
+  const rawTitle = page.title || "";
+  const displayTitle = rawTitle ? rawTitle : `${sourcePlatform} Context`;
+  const dateStr = new Date().toISOString().replace("T", " ").slice(0, 19) + " UTC";
+  const origTok = estTok(state.rawMessages.map(m => m.text).join(" "));
+  const compTok = estTok(state.compressed);
+  const savedTok = Math.max(0, origTok - compTok);
+  const pctSaved = origTok > 0 ? Math.round(savedTok / origTok * 100) : 0;
+
+  const modeLabels = {
+    "context": "Full Chat (Verbatim)",
+    "smart": "Smart Compression (Stripped filler, preserved code)",
+    "aggressive": "Aggressive Bullet Summary",
+    "user-only": "User Prompts Only",
+    "raw": "Raw Transcript"
+  };
+  const modeName = modeLabels[state.mode] || state.mode;
+
+  // Frontmatter Header (YAML format for IDE / CLI ingestion)
+  const headerLines = [
+    "---",
+    `title: ${JSON.stringify(displayTitle)}`,
+    `source_platform: ${JSON.stringify(sourcePlatform)}`,
+    `date: ${JSON.stringify(dateStr)}`,
+    `compression_mode: ${JSON.stringify(modeName)}`,
+    `messages_count: ${state.rawMessages.length}`,
+    `estimated_tokens_original: ${origTok}`,
+    `estimated_tokens_compressed: ${compTok}`,
+    `tokens_saved: "${savedTok.toLocaleString()} (${pctSaved}%)"`,
+    `source_url: ${JSON.stringify(page.url || currentTab?.url || "")}`,
+    "---",
+    "",
+    `# 🌉 ChatBridge Context Export: ${displayTitle}`,
+    "",
+    `> **Source:** ${sourcePlatform}  `,
+    `> **Exported:** ${dateStr}  `,
+    `> **Mode:** ${modeName}  `,
+    `> **Context Size:** ~${compTok.toLocaleString()} tokens (${pctSaved}% saved from ~${origTok.toLocaleString()} tokens)  `,
+    page.url ? `> **URL:** [${page.url}](${page.url})  ` : "",
+    "",
+    "---",
+    "",
+    "## 🎯 Context & Directives for IDE / Claude Code",
+    `The following is an exported conversation context from **${sourcePlatform}**. Use the technical discussions, architecture decisions, requirements, and code implementations below as active context for continuing work in this codebase.`,
+    "",
+    "---",
+    ""
+  ].filter(l => l !== "");
+
+  let body = "";
+  if (state.mode === "context") {
+    body = "## 💬 Full Conversation Transcript\n\n" + state.rawMessages.map((m, idx) => {
+      const isUser = m.role === "human";
+      const roleLabel = isUser ? "👤 User" : `🤖 Assistant (${sourcePlatform})`;
+      return `### ${idx + 1}. ${roleLabel}\n\n${cleanChatText(m.text)}`;
+    }).join("\n\n");
+  } else if (state.mode === "user-only") {
+    body = "## 👤 User Questions & Prompts\n\n" + state.rawMessages.filter(m => m.role === "human").map((m, idx) => {
+      return `#### Q${idx + 1}\n${cleanChatText(m.text)}`;
+    }).join("\n\n");
+  } else if (state.mode === "smart") {
+    body = "## 🧠 Smart-Compressed Context\n\n" + state.rawMessages.map((m, idx) => {
+      if (isTrivialGreeting(m.text)) return "";
+      const isUser = m.role === "human";
+      const roleLabel = isUser ? "👤 User" : `🤖 Assistant (${sourcePlatform})`;
+      const reduced = reduceSmart(m.text);
+      if (!reduced) return "";
+      return `### ${idx + 1}. ${roleLabel}\n\n${reduced}`;
+    }).filter(Boolean).join("\n\n");
+  } else {
+    body = "## 📋 Context Content\n\n" + state.compressed;
+  }
+
+  const footer = "\n\n---\n*Generated by [ChatBridge](https://github.com/Rajivkhurana/Chat-Bridge) — Move AI conversations with zero context loss.*";
+  return `${headerLines.join("\n")}\n\n${body}${footer}`.trim();
+}
+
+function getExportFilename() {
+  const host = currentTab?.url ? new URL(currentTab.url).hostname : "";
+  let sourceTag = "chat";
+  if (host.includes("claude.ai")) sourceTag = "claude";
+  else if (host.includes("chatgpt.com") || host.includes("openai.com")) sourceTag = "chatgpt";
+  else if (host.includes("gemini.google.com")) sourceTag = "gemini";
+  else if (host.includes("perplexity.ai")) sourceTag = "perplexity";
+
+  const rawTitle = state.pageContext?.title || "";
+  const cleanTitle = rawTitle
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 30);
+
+  const dateStr = new Date().toISOString().slice(0, 10);
+  return cleanTitle ? `chatbridge-${sourceTag}-${cleanTitle}.md` : `chatbridge-${sourceTag}-${dateStr}.md`;
+}
+
+function downloadMarkdownFile(content, filename) {
+  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 // ── SEND ACTION HELPER ────────────────────────────────────────────────────────
 async function executeSend() {
   if (!state.compressed) return;
   setLoading($btnSend, true, '<span class="stepno">3</span>Send →', 'Sending…');
+
+  if (state.target === "markdown") {
+    const md = buildStructuredMarkdown();
+    const filename = getExportFilename();
+    downloadMarkdownFile(md, filename);
+    showToast(`💾 ${getSWQuote("export")}`);
+    setLoading($btnSend, false, '<span class="stepno">3</span>Export .md 📥');
+    return;
+  }
 
   if (state.target === "clipboard") {
     try { await navigator.clipboard.writeText(state.compressed); }
@@ -692,7 +826,7 @@ async function executeSend() {
       document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
     }
     showToast(`📋 ${getSWQuote("copy")}`);
-    setLoading($btnSend, false, '<span class="stepno">3</span>Send →');
+    setLoading($btnSend, false, '<span class="stepno">3</span>Copy 📋');
     return;
   }
 
