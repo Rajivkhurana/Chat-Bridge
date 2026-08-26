@@ -326,10 +326,18 @@
       background: rgba(99, 102, 241, 0.05);
       font-weight: 600;
     }
-    .tbtn svg {
+    .tbtn svg,
+    .tbtn img {
       width: 14px;
       height: 14px;
+      object-fit: contain;
+      border-radius: 2px;
       flex-shrink: 0;
+    }
+    .tbtn[data-target="chatgpt"] img {
+      width: 16px;
+      height: 16px;
+      transform: scale(1.2);
     }
 
     .preview {
@@ -697,32 +705,22 @@
       <div class="target-row">
         <!-- ChatGPT -->
         <button class="tbtn sel" data-target="chatgpt" title="Open ChatGPT and paste context into prompt box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#10a37f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2z"/>
-            <path d="M12 6v12M6 12h12"/>
-          </svg>
+          <img src="asset/ChatGPT-Logo.png" alt="ChatGPT">
           ChatGPT
         </button>
         <!-- Claude -->
         <button class="tbtn" data-target="claude" title="Open Claude and paste context into prompt box">
-          <svg viewBox="0 0 24 24" fill="#d97706">
-            <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/>
-          </svg>
+          <img src="asset/claude.png" alt="Claude">
           Claude
         </button>
         <!-- Gemini -->
         <button class="tbtn" data-target="gemini" title="Open Google Gemini and paste context into prompt box">
-          <svg viewBox="0 0 24 24" fill="#2563eb">
-            <path d="M12 2C12 7.523 7.523 12 2 12C7.523 12 12 16.477 12 22C12 16.477 16.477 12 22 12C16.477 12 12 7.523 12 2Z"/>
-          </svg>
+          <img src="asset/gemini.jpg" alt="Gemini">
           Gemini
         </button>
         <!-- Perplexity -->
         <button class="tbtn" data-target="perplexity" title="Open Perplexity AI and paste context into search box">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
+          <img src="asset/perplexity.png" alt="Perplexity">
           Perplexity
         </button>
         <!-- Copy -->
