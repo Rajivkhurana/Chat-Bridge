@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ChatBridge – AI Chat Compressor",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Extract any AI chat conversation, compress it, and send it to ChatGPT, Claude, Gemini, or Perplexity in one click. Optional AI-powered compression using your own key from OpenRouter, NVIDIA, Groq, Together, Fireworks, DeepInfra, Mistral, or OpenAI.",
   "permissions": [
     "activeTab",

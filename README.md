@@ -36,7 +36,8 @@ filler. ChatBridge extracts, compresses, and re-injects it in one click.
 
 - **Reads the current chat directly from the page** — Claude, ChatGPT,
   Gemini, and Perplexity, with layered fallbacks so it still gets *something*
-  usable if a site's layout has changed.
+  usable if a site's layout has changed. Image attachments are marked in the
+  transcript with available alt text; image pixels are not transferred.
 - **Five compression modes**, entirely local (no network call):
   - `Full Chat` — the whole conversation, cleanly formatted, no truncation
   - `Smart` — strips greetings/filler, keeps the substance (~40% smaller)
@@ -121,6 +122,8 @@ API when you click AI Compress — never anywhere else.
 - Extraction relies on each site's current DOM structure. When a site
   redesigns its chat UI, extraction may need a selector update — if a chat
   doesn't extract cleanly, try Copy mode as a fallback, or open an issue.
+- Image attachments are represented by their available alt text or an
+  attachment placeholder; ChatBridge does not extract or send image contents.
 - Auto-paste uses the browser's standard text-insertion APIs; if a target
   site changes its input element, auto-paste may fail (the extension will
   tell you, and Copy mode always works as a fallback).

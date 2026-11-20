@@ -246,6 +246,11 @@ $btnExtract.addEventListener("click", async () => {
     state.pageContext = result?.pageContext || null;
 
     if (!msgs.length) {
+      state.rawMessages = [];
+      state.compressed = "";
+      $btnSend.disabled = true;
+      updateAiButtonState();
+      renderCompressed();
       showStatus("err", isSupported ? "No messages found — is the chat empty?" : "Not a supported chat page (open Claude, ChatGPT, Gemini, or Perplexity)");
       $preview.innerHTML = '<span class="ph">No messages found. Try scrolling up or opening a chat.</span>';
       return;
@@ -296,6 +301,27 @@ function extractChatFromPage() {
   };
 
   const msgs = [];
+  const readMessageText = el => {
+    const text = el.innerText?.trim() || "";
+    const imageNotes = [];
+    const imageNodes = [...el.querySelectorAll("img, [role='img']")].filter(image =>
+      image.matches("img") || !image.querySelector("img")
+    );
+
+    imageNodes.forEach(image => {
+      const description = (image.getAttribute("alt") || image.getAttribute("aria-label") || "").trim();
+      const rect = image.getBoundingClientRect();
+      const hasVisibleImageSize = rect.width >= 48 && rect.height >= 48;
+      if (!description && !hasVisibleImageSize) return;
+
+      const note = description
+        ? `[Image attached: ${description}]`
+        : "[Image attached; visual content was not extracted]";
+      if (!imageNotes.includes(note)) imageNotes.push(note);
+    });
+
+    return [text, ...imageNotes].filter(Boolean).join("\n\n");
+  };
 
   // ════════════════════════════════════════════════
   //  CLAUDE
@@ -313,8 +339,8 @@ function extractChatFromPage() {
     const leaves = items.filter(i1 => !items.some(i2 => i1 !== i2 && i1.el.contains(i2.el)));
     leaves.sort((a, b) => a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
     leaves.forEach(({ role, el }) => {
-      const text = el.innerText?.trim();
-      if (text) msgs.push({ role, text });
+      const text = readMessageText(el);
+      if (text) msgs.push({ role, text, el });
     });
   }
 
@@ -323,21 +349,48 @@ function extractChatFromPage() {
   // ════════════════════════════════════════════════
   else if (host.includes("chatgpt.com") || host.includes("openai.com")) {
     const items = [];
-    document.querySelectorAll("[data-message-author-role='user']").forEach(el => items.push({ role: "human", el }));
-    document.querySelectorAll("[data-message-author-role='assistant']").forEach(el => items.push({ role: "assistant", el }));
+    const root = document.querySelector("main") || document;
+    const conversation = root.querySelector(
+      "[role='region'][aria-label='Conversation'], [class*='thread-scroll-container']"
+    ) || root;
+    const addItems = (selector, role) => {
+      conversation.querySelectorAll(selector).forEach(el => {
+        if (!items.some(item => item.el === el)) items.push({ role, el });
+      });
+    };
+
+    addItems("[data-message-author-role='user'], [data-testid='user-message']", "human");
+    addItems("[data-message-author-role='assistant'], [data-testid='assistant-message']", "assistant");
+    addItems("[class*='group/user-message']", "human");
+    addItems("[class*='MarkdownRoot']", "assistant");
+
+    const turns = conversation.querySelectorAll("[data-testid^='conversation-turn-'], [data-message-id]");
+    turns.forEach(turn => {
+      const userMessage = turn.matches("[data-message-author-role='user'], [data-testid='user-message']")
+        ? turn
+        : turn.querySelector("[data-message-author-role='user'], [data-testid='user-message']");
+      const assistantMessage = turn.matches("[data-message-author-role='assistant'], [data-testid='assistant-message']")
+        ? turn
+        : turn.querySelector("[data-message-author-role='assistant'], [data-testid='assistant-message']");
+
+      if (userMessage) {
+        if (!items.some(item => item.el === userMessage)) items.push({ role: "human", el: userMessage });
+      } else if (assistantMessage) {
+        if (!items.some(item => item.el === assistantMessage)) items.push({ role: "assistant", el: assistantMessage });
+      } else if (!items.some(item => item.el === turn)) {
+        items.push({ role: "unknown", el: turn });
+      }
+    });
 
     if (!items.length) {
-      document.querySelectorAll("article").forEach(el => {
-        if (el.querySelector("[data-message-author-role='user']")) return;
-        items.push({ role: "unknown", el });
-      });
+      conversation.querySelectorAll("article").forEach(el => items.push({ role: "unknown", el }));
     }
 
     const leaves = items.filter(i1 => !items.some(i2 => i1 !== i2 && i1.el.contains(i2.el)));
     leaves.sort((a, b) => a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
     leaves.forEach(({ role, el }) => {
-      const text = el.innerText?.trim();
-      if (text) msgs.push({ role, text });
+      const text = readMessageText(el);
+      if (text) msgs.push({ role, text, el });
     });
   }
 
@@ -352,8 +405,8 @@ function extractChatFromPage() {
     const leaves = items.filter(i1 => !items.some(i2 => i1 !== i2 && i1.el.contains(i2.el)));
     leaves.sort((a, b) => a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
     leaves.forEach(({ role, el }) => {
-      const text = el.innerText?.trim();
-      if (text) msgs.push({ role, text });
+      const text = readMessageText(el);
+      if (text) msgs.push({ role, text, el });
     });
   }
 
@@ -368,17 +421,19 @@ function extractChatFromPage() {
     const leaves = items.filter(i1 => !items.some(i2 => i1 !== i2 && i1.el.contains(i2.el)));
     leaves.sort((a, b) => a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1);
     leaves.forEach(({ role, el }) => {
-      const text = el.innerText?.trim();
-      if (text) msgs.push({ role, text });
+      const text = readMessageText(el);
+      if (text) msgs.push({ role, text, el });
     });
   }
 
-  // Deduplicate & clean
+  // Deduplicate overlapping selectors by element, not text: users may repeat a message.
   const seen = new Set();
   const messages = msgs.filter(m => {
     if (!m.text || m.text.length < 2) return false;
-    if (seen.has(m.text)) return false;
-    seen.add(m.text); return true;
+    if (seen.has(m.el)) return false;
+    seen.add(m.el);
+    delete m.el;
+    return true;
   });
   return { messages, pageContext };
 }
